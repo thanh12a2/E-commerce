@@ -122,10 +122,3 @@ Việc áp dụng **Database-per-service** đồng nghĩa với việc từ bỏ
 
 ---
 
-## 8. ✅ Quy Trình Kiểm Thử, Triển Khai & Vận Hành (Ops/UAT)
-
-- **Shared Contracts (Giao kèo nội bộ)**: Xác lập tài liệu cấu trúc dữ liệu chung (`docs/phase-1-shared-contract.md`) giữa team Backend và team AI. Đảm bảo schema của CSV, JSON và các Event Vocabulary là bất biến.
-- **Triển khai Container hóa**: Toàn bộ kiến trúc được gói trong Docker. Hệ thống hỗ trợ khởi chạy `Zero-config` thông qua lệnh `docker compose up`. 
-- **Kiểm thử nghiệm thu (UAT)**: Được thiết kế riêng biệt để đánh giá tính trọn vẹn:
-  - Phân tách UAT cho Customer (Mô phỏng hành vi truy cập, mua sắm, nhận tư vấn AI).
-  - Phân tách UAT cho Staff (Thử nghiệm đăng nhập quyền hạn, CRUD danh mục, và luồng chuyển đổi trạng thái giao hàng chéo service).
