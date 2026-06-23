@@ -57,7 +57,10 @@ Hệ thống được chia cắt thành 6 miền nghiệp vụ (Bounded Contexts
 
 Dự án áp dụng triệt để kiến trúc Microservices với 6 dịch vụ độc lập, giao tiếp với nhau qua mạng nội bộ Docker và chỉ phơi bày endpoint ra ngoài thông qua một **API Gateway (Nginx)** duy nhất tại port `8080`.
 
-![System Architecture](EssayV1/final_diagram_images/ecom_system_architecture.png)
+![System Architecture](EssayV1/system_architecture.png)
+
+*(Biểu đồ lớp tổng quát toàn hệ thống)*
+![Class Diagram](EssayV1/final_diagram_images/Class_Diagram_E_Commerce.png)
 
 1. **`user_service`**: Đóng vai trò là Orchestrator chính cho Web UI, quản lý Authentication (Session cho UI, JWT cho API). Gọi tới các service khác để lấy dữ liệu tổng hợp cho màn hình Dashboard.
 2. **`product_service`**: Chứa Catalog (Danh mục, Sản phẩm). API cung cấp quyền Read cho Customer và quyền Write cho Staff.
@@ -78,7 +81,7 @@ Khi khách hàng bấm "Tiến hành thanh toán", một chuỗi tác vụ phân
 2. **Order Service** truy vấn dữ liệu sản phẩm từ **Product Service**. Hệ thống thực hiện hành vi **chụp lại (snapshot)** giá cả và tên sản phẩm để lưu cứng vào `OrderItem`.
 3. **Order Service** ra lệnh khởi tạo giao dịch (Pending) tới **Payment Service**.
 4. Đồng thời, gửi thông tin địa chỉ sang **Shipping Service** để tạo mã vận chuyển dự kiến.
-![Checkout Sequence](EssayV1/final_diagram_images/ecom_checkout_sequence.png)
+![Checkout Sequence](EssayV1/checkout_sequence.png)
 
 ### 5.2. Luồng Điều Phối Vận Đơn & Cập Nhật Dữ Luệu (Staff - Quản trị vận hành)
 Đây là quy trình quản lý dữ liệu hậu kỳ sau khi khách mua hàng:
@@ -93,7 +96,7 @@ Trợ lý AI không chỉ là một cái vỏ chat, mà là một quy trình tí
 2. **Graph Update**: Các sự kiện này được ghi vào Neo4j (`User` -> `PREFERS` -> `Category`), vẽ ra sơ đồ tri thức về thói quen người dùng.
 3. **Hybrid Retrieval (RAG)**: Khi user nhắn tin, luồng truy vấn sẽ quét qua file Catalog (RAG), quét Graph từ Neo4j, và chạy mô hình ML phân loại nhu cầu để tạo Context tổng hợp.
 4. **LLM Generation**: LLM (Gemma/Gemini) sinh câu trả lời tự nhiên đi kèm với cấu trúc Product Card để render UI trực quan.
-![AI Pipeline](EssayV1/final_diagram_images/ecom_ai_pipeline.png)
+*(Tham khảo giao diện AI Chat: `EssayV1/chat_widget.png`)*
 
 ---
 
@@ -104,7 +107,10 @@ Việc áp dụng **Database-per-service** đồng nghĩa với việc từ bỏ
 - **Logical Association**: Các bảng trong `order_db` hay `payment_db` lưu `user_id` dưới dạng số nguyên (integer) đơn thuần. 
 - **Data Snapshotting**: Luồng Giỏ hàng (`CartItem`) và Đơn hàng (`OrderItem`) sao chép toàn bộ thông tin quan trọng (`product_name`, `unit_price`, `brand`, `image_url`) từ `product_db` sang `order_db` tại thời điểm đó thay vì chỉ tham chiếu FK. **Lợi ích thực tế cho Staff:** Khi Staff sửa giá hoặc xóa sản phẩm trong tương lai trên `product_db`, lịch sử hóa đơn tài chính trên `order_db` vẫn giữ nguyên sự nguyên vẹn và không bị biến dạng.
 - **Neo4j Graph**: Tận dụng cơ sở dữ liệu đồ thị để lưu các mối quan hệ đa chiều. Tránh JOIN chéo hàng chục bảng SQL phức tạp để lọc ra nhu cầu khách hàng.
-![Database Mapping](EssayV1/final_diagram_images/ecom_database_mapping.png)
+![Database Mapping](EssayV1/database_mapping.png)
+
+*(Biểu đồ thực thể liên kết ERD chi tiết)*
+![Data Model ORM](EssayV1/final_diagram_images/DataModel_ORM_ERD.png)
 
 ---
 
