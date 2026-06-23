@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Create Staff Account — Nike Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="/static/css/staff_styles.css">
+</head>
+<body class="staff-login-page">
+  <div class="login-card">
+    <div class="logo">Nike <span style="color:var(--muted);font-weight:400;">Lab</span> Staff</div>
+    <h1>Create Staff Account</h1>
+    <p class="subtitle">Staff accounts have full access to catalog, customers, and order management.</p>
+    {% include 'partials/messages.html' %}
+    {% if form.non_field_errors %}
+    <div class="msg msg-error" style="margin-bottom:14px;">{{ form.non_field_errors.0 }}</div>
+    {% endif %}
+    <form method="post" id="staff-register-form">
+      {% csrf_token %}
+      <p>
+        <label for="id_username">Username</label>
+        {{ form.username }}
+        {% if form.username.errors %}<span style="color:var(--error);font-size:12px;">{{ form.username.errors.0 }}</span>{% endif %}
+      </p>
+      <p>
+        <label for="id_email">Email</label>
+        {{ form.email }}
+        {% if form.email.errors %}<span style="color:var(--error);font-size:12px;">{{ form.email.errors.0 }}</span>{% endif %}
+      </p>
+      <p>
+        <label for="id_password">Password</label>
+        {{ form.password }}
+      </p>
+      <p>
+        <label for="id_confirm_password">Confirm Password</label>
+        {{ form.confirm_password }}
+      </p>
+      <button type="submit" id="staff-register-submit">Create Staff Account</button>
+    </form>
+    <p class="auth-switch">Already registered? <a href="/staff/login/">Sign in</a></p>
+  </div>
+</body>
+</html>

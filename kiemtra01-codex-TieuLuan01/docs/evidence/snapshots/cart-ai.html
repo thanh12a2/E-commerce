@@ -1,0 +1,109 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your Cart</title>
+  <base href="http://localhost:8000/">
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <style>[data-reveal]{opacity:1!important;transform:none!important} .assist-panel{opacity:0;transform:translateY(16px) scale(0.98);pointer-events:none} .assist-shell{position:fixed!important;right:22px!important;bottom:22px!important}</style>
+</head>
+<body class="store-body">
+  <div class="promo-strip" aria-hidden="true">
+    <span>Get a 20% discount</span><span>USE CODE 20PD</span><span>Get a 20% discount</span><span>USE CODE 20PD</span>
+    <span>Get a 20% discount</span><span>USE CODE 20PD</span><span>Get a 20% discount</span><span>USE CODE 20PD</span>
+  </div>
+  <header class="top-nav-wrap">
+    <div class="top-nav shell">
+      <a class="logo-mark" href="/customer/dashboard/" aria-label="Home">UN</a>
+      <nav class="menu-pill" aria-label="Main">
+        <a href="/customer/dashboard/#section-categories">Categories</a>
+        <a href="/customer/dashboard/#section-products">Products</a>
+        <a href="/customer/dashboard/#section-stories">Blogs</a>
+        <a href="/customer/dashboard/#section-newsletter">Newsletter</a>
+      </nav>
+      <div class="nav-actions">
+        <a class="ghost-btn" href="/customer/cart/">Cart</a>
+        <a class="ghost-btn" href="/customer/saved/">Saved</a>
+        <a class="ghost-btn" href="/customer/orders/">Orders</a>
+        <a class="ghost-btn" href="/customer/compare/">Compare</a>
+        <a class="ghost-btn" href="/customer/logout/">Logout</a>
+      </div>
+    </div>
+  </header>
+  <main class="page-wrap shell page-enter">
+    <section class="section-head cart-head">
+      <span>Cart</span>
+      <h1>Your <em>Shopping Cart</em></h1>
+      <p>Review products, add shipping details, then create a pending order.</p>
+    </section>
+
+    <section class="cart-grid">
+      <div class="cart-list-panel">
+        <article class="cart-row">
+          <a class="cart-thumb" href="/customer/products/smartphones/42/">
+            <img loading="lazy" src="https://example.com/pixel.jpg" alt="Pixel Frame 9">
+          </a>
+          <div class="cart-row-main">
+            <h3>Pixel Frame 9</h3>
+            <p>Google | Smartphones</p>
+            <p>Qty: 1</p>
+          </div>
+          <div class="cart-row-right">
+            <strong>$899.00</strong>
+            <button type="button" class="cta-light danger-light">Remove</button>
+          </div>
+        </article>
+      </div>
+
+      <aside class="cart-summary">
+        <h2>Summary</h2>
+        <p>Total: <strong>$899.00</strong></p>
+        <p><label>Recipient name</label><input type="text" value="Demo Customer"></p>
+        <p><label>Phone</label><input type="text" value="0900000000"></p>
+        <p><label>Address line</label><input type="text" value="123 Demo Street"></p>
+        <p><label>City or region</label><input type="text" value="Ho Chi Minh City"></p>
+        <p><label>Postal code</label><input type="text" value="700000"></p>
+        <p><label>Country</label><input type="text" value="VN"></p>
+        <p><label>Note</label><textarea rows="3">Phase 6 demo order.</textarea></p>
+        <a href="#" class="cta-dark block-link">Create Order</a>
+        <a href="/customer/dashboard/" class="cta-light block-link">Continue Shopping</a>
+      </aside>
+    </section>
+
+    <section class="ai-block" data-reveal>
+      <div class="ai-block-head">
+        <div>
+          <span>AI Basket Layer</span>
+          <h2>Co the mua kem</h2>
+          <div class="ai-block-summary">AI suggests an audio add-on for this phone.</div>
+        </div>
+        <div class="ai-block-meta">
+          <strong>Source: gemma_4_31b</strong>
+        </div>
+      </div>
+      <div class="ai-suggestion-grid">
+        <article class="ai-suggestion-card">
+          <a class="ai-suggestion-image" href="/customer/products/audio/88/">
+            <span class="product-service">Audio</span>
+            <img loading="lazy" src="https://example.com/audio.jpg" alt="QuietBeat ANC">
+          </a>
+          <div class="ai-suggestion-copy">
+            <h3>QuietBeat ANC</h3>
+            <p>Sony | Audio</p>
+          </div>
+          <div class="price-row">
+            <strong>$199.00</strong>
+            <span>Stock: 12</span>
+          </div>
+          <a class="cta-dark" href="/customer/products/audio/88/">View Suggestion</a>
+        </article>
+      </div>
+      <div class="ai-citation-row">
+        <a href="/customer/products/audio/88/">Product catalog</a>
+      </div>
+    </section>
+  </main>
+  <div class="assist-shell"><button type="button" class="assist-fab"><span>Chat</span></button></div>
+</body>
+</html>

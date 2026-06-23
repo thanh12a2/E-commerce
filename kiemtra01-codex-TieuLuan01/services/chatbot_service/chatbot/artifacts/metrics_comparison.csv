@@ -1,0 +1,4 @@
+model_name,accuracy,macro_precision,macro_recall,macro_f1,params,best_epoch,best_val_loss,best_val_accuracy,training_seconds,artifact_model,is_best
+rnn,0.999201,0.999587,0.999237,0.99941,11192,7,0.062728,0.996697,11.01,model_rnn.keras,True
+lstm,0.999201,0.999587,0.999237,0.99941,29432,4,0.058818,0.996697,6.79,model_lstm.keras,False
+bilstm,0.999201,0.999587,0.999237,0.99941,57848,2,0.033347,0.997523,7.13,model_bilstm.keras,False

@@ -1,0 +1,216 @@
+{% extends 'staff/base.html' %}
+{% block title %}Staff Dashboard{% endblock %}
+{% block content %}
+
+<!-- Page header -->
+<div class="page-header">
+  <div>
+    <h1>Dashboard</h1>
+    <p class="subtitle">Business overview for the last {{ selected_range_days }} days.</p>
+  </div>
+  <div class="page-header-actions">
+    <a class="table-btn primary" href="/staff/items/?category=all">Manage Products</a>
+    <a class="table-btn" href="/staff/orders/">View Orders</a>
+  </div>
+</div>
+
+<!-- Time range filter -->
+<div class="time-filter-row">
+  <span style="font-size:11px;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.5px;">Range:</span>
+  {% for days in time_ranges %}
+  <a href="/staff/dashboard/?range={{ days }}" class="time-filter-chip {% if selected_range_days == days %}active{% endif %}" id="range-{{ days }}-btn">{{ days }}d</a>
+  {% endfor %}
+  <span class="time-filter-note">{{ range_start }} → {{ range_end }}</span>
+</div>
+
+<!-- Two column layout -->
+<div class="grid-two staff-dashboard-grid">
+
+  <!-- Left: Catalog + Order Stats -->
+  <div>
+    <!-- Inventory Stats -->
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <h2>Catalog Health</h2>
+          <p class="panel-subtitle">Inventory snapshot across all 10 categories.</p>
+        </div>
+        <a class="table-btn" href="/staff/items/?category=all">View All →</a>
+      </div>
+      <div class="stats-grid">
+        <div class="stats-card"><p class="stats-label">Total Products</p><p class="stats-value green">{{ total_items }}</p></div>
+        <div class="stats-card"><p class="stats-label">Total Stock Units</p><p class="stats-value">{{ total_stock }}</p></div>
+        <div class="stats-card"><p class="stats-label">Inventory Value</p><p class="stats-value green">${{ total_inventory_value|floatformat:0 }}</p></div>
+        <div class="stats-card {% if low_stock_items > 0 %}warning{% endif %}"><p class="stats-label">Low Stock {% if low_stock_items > 0 %}⚠{% endif %}</p><p class="stats-value">{{ low_stock_items }}</p></div>
+      </div>
+    </div>
+
+    <!-- Order Stats -->
+    <div class="panel">
+      <h2>Order Insights</h2>
+      <p class="panel-subtitle">Commerce performance for the selected period.</p>
+      <div class="order-stats-grid">
+        <div class="stats-card"><p class="stats-label">Total Orders</p><p class="stats-value">{{ order_stats.total_orders }}</p></div>
+        <div class="stats-card"><p class="stats-label">Paid Orders</p><p class="stats-value green">{{ order_stats.paid_orders }}</p></div>
+        <div class="stats-card"><p class="stats-label">Pending</p><p class="stats-value">{{ order_stats.pending_orders }}</p></div>
+        <div class="stats-card"><p class="stats-label">Revenue</p><p class="stats-value green">${{ order_stats.total_revenue }}</p></div>
+        <div class="stats-card"><p class="stats-label">Active Customers</p><p class="stats-value">{{ active_customers }}</p></div>
+        <div class="stats-card"><p class="stats-label">Avg Paid Order</p><p class="stats-value">${{ order_stats.average_paid_order_value }}</p></div>
+      </div>
+    </div>
+
+    <!-- Category Breakdown Chart -->
+    <div class="panel">
+      <h2>Category Breakdown</h2>
+      <p class="panel-subtitle">Items and stock distribution across product lines.</p>
+      <div class="chart-grid">
+        <div class="chart-card">
+          <h3>Products by Category</h3>
+          {% for row in service_breakdown %}
+          <div class="bar-row">
+            <div class="bar-meta">
+              <span>{{ row.category_name|default:row.service|title }}</span>
+              <span>{{ row.count }} items</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill c-default" style="width:{% if total_items > 0 %}{% widthratio row.count total_items 100 %}%{% else %}0%{% endif %};"></div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="chart-card">
+          <h3>Stock per Category</h3>
+          {% for row in service_breakdown %}
+          <div class="bar-row">
+            <div class="bar-meta">
+              <span>{{ row.category_name|default:row.service|title }}</span>
+              <span>{{ row.stock }}</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill c-laptop" style="width:{% if total_stock > 0 %}{% widthratio row.stock total_stock 100 %}%{% else %}0%{% endif %};"></div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Recent Orders + Top Customers + Latest Products -->
+  <div>
+    <!-- Recent Orders -->
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <h2>Recent Orders</h2>
+          <p class="panel-subtitle">Latest activity across all customers.</p>
+        </div>
+        <a class="table-btn" href="/staff/orders/">All Orders →</a>
+      </div>
+      {% if recent_orders %}
+      <div class="table-scroll-wrap">
+        <table class="staff-items-table compact-table">
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th>Customer</th>
+              <th>Payment</th>
+              <th>Shipping</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for order in recent_orders %}
+            <tr>
+              <td>#{{ order.order_id }}</td>
+              <td>{{ order.display_name|default:order.username }}</td>
+              <td>
+                <span class="badge-status {% if order.payment_status == 'paid' %}badge-paid{% elif order.payment_status == 'pending' %}badge-pending{% else %}badge-cancelled{% endif %}">
+                  {{ order.payment_status }}
+                </span>
+              </td>
+              <td>
+                <span class="badge-status {% if order.shipping_status == 'delivered' %}badge-delivered{% elif order.shipping_status == 'shipped' %}badge-shipped{% else %}badge-pending{% endif %}">
+                  {{ order.shipping_status }}
+                </span>
+              </td>
+              <td style="color:var(--accent);font-weight:700;">${{ order.total_amount }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p style="color:var(--dim);font-size:13px;">No recent orders yet.</p>
+      {% endif %}
+    </div>
+
+    <!-- Top Customers -->
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <h2>Top Customers</h2>
+          <p class="panel-subtitle">By total spend in period.</p>
+        </div>
+        <a class="table-btn" href="/staff/customers/">All Customers →</a>
+      </div>
+      {% if top_customers %}
+      <table class="staff-items-table compact-table">
+        <thead>
+          <tr><th>Customer</th><th>Paid</th><th>Units</th><th>Spent</th></tr>
+        </thead>
+        <tbody>
+          {% for c in top_customers %}
+          <tr>
+            <td>
+              <a href="/staff/customers/{{ c.user_id }}/" style="color:var(--text);">{{ c.display_name|default:c.username }}</a>
+            </td>
+            <td>{{ c.paid_order_count }}</td>
+            <td>{{ c.total_units }}</td>
+            <td style="color:var(--accent);font-weight:700;">${{ c.total_spent }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p style="color:var(--dim);font-size:13px;">No customer data available yet.</p>
+      {% endif %}
+    </div>
+
+    <!-- Latest Products -->
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <h2>Latest Products</h2>
+          <p class="panel-subtitle">Recently fetched from the unified catalog.</p>
+        </div>
+        <a class="table-btn primary" href="/staff/items/?category=all">Manage →</a>
+      </div>
+      {% if recent_items %}
+      <div class="table-scroll-wrap">
+        <table class="staff-items-table compact-table">
+          <thead>
+            <tr><th>ID</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th></tr>
+          </thead>
+          <tbody>
+            {% for item in recent_items %}
+            <tr>
+              <td style="color:var(--dim);">{{ item.id }}</td>
+              <td>{{ item.name }}</td>
+              <td>
+                <span class="badge-status badge-pending" style="font-size:9px;">{{ item.category_name|default:item.category_slug|default:item.service|title }}</span>
+              </td>
+              <td style="color:var(--accent);font-weight:700;">${{ item.price }}</td>
+              <td class="{% if item.stock == 0 %}stock-out{% elif item.stock <= 5 %}stock-low{% else %}stock-ok{% endif %}">{{ item.stock }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p style="color:var(--dim);font-size:13px;">No products available yet.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

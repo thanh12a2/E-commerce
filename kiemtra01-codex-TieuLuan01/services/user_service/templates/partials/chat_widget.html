@@ -1,0 +1,79 @@
+<div class="assist-shell" data-assist-shell>
+  <button type="button" class="assist-fab" data-assist-toggle aria-label="Open assistant" aria-expanded="false" aria-controls="floating-assist-panel">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path></svg>
+  </button>
+
+  <section
+    id="floating-assist-panel"
+    class="assist-panel"
+    data-assist-panel
+    data-assist-panel-root
+    data-chat-endpoint="/customer/chatbot/reply/"
+    data-assist-storage-key="assist-history:user-{{ request.user.id|default:'anon' }}"
+    {% if chatbot_current_product %}
+    data-category-slug="{{ chatbot_current_product.category_slug|default:chatbot_current_product.service }}"
+    data-category-name="{{ chatbot_current_product.category_name }}"
+    data-product-id="{{ chatbot_current_product.id }}"
+    data-product-name="{{ chatbot_current_product.name }}"
+    data-product-brand="{{ chatbot_current_product.brand }}"
+    data-product-price="{{ chatbot_current_product.price }}"
+    {% endif %}
+  >
+    <header class="assist-head">
+      <div>
+        <p class="assist-head-kicker">AI Assistant</p>
+        <h3>{{ chatbot_title|default:'Store Assistant' }}</h3>
+        <p>{{ chatbot_subtitle|default:'Ask about products and availability.' }}</p>
+      </div>
+      <div class="assist-head-actions">
+        <button type="button" class="assist-clear" data-assist-clear aria-label="Clear chat history">Clear</button>
+        <button type="button" class="assist-close" data-assist-close aria-label="Close assistant">x</button>
+      </div>
+    </header>
+
+    <div class="assist-log" data-assist-log>
+      <article class="assist-msg assist-msg-assistant">
+        <p>
+          {% if chatbot_current_product %}
+          Ask me about this item, similar options, or what is in stock right now.
+          {% else %}
+          Ask about products on this website, budget options, or in-stock recommendations.
+          {% endif %}
+        </p>
+      </article>
+    </div>
+
+    <div class="assist-quick-row" data-assist-quick-row>
+      <button type="button" class="assist-quick-btn" data-assist-quick="Show me in-stock options under $1000.">Under $1000</button>
+      <button type="button" class="assist-quick-btn" data-assist-quick="What products are available on this store right now?">In Stock</button>
+      <button type="button" class="assist-quick-btn" data-assist-quick="/model gemma">Use Gemma</button>
+      <button type="button" class="assist-quick-btn" data-assist-quick="/model gemini">Use Gemini</button>
+      {% if chatbot_current_product %}
+      <button type="button" class="assist-quick-btn" data-assist-quick="Recommend products similar to this one.">Similar</button>
+      {% else %}
+      <button type="button" class="assist-quick-btn" data-assist-quick="Recommend a practical work setup across different categories.">Work Setup</button>
+      {% endif %}
+    </div>
+
+    <div class="assist-quick-row">
+      <button type="button" class="assist-quick-btn" data-assist-quick="/model">Current Model</button>
+    </div>
+
+    <form class="assist-form" data-assist-form>
+      <div class="assist-input-wrap">
+        <input
+          type="text"
+          name="message"
+          data-assist-input
+          maxlength="500"
+          placeholder="Message AI Assistant..."
+          autocomplete="off"
+          required
+        >
+        <button class="assist-send-btn" type="submit" data-assist-send aria-label="Send">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+        </button>
+      </div>
+    </form>
+  </section>
+</div>

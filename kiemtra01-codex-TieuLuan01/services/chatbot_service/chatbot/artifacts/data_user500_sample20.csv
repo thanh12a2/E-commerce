@@ -1,0 +1,21 @@
+user_ref,event_ts,step_index,behavior_type,category_slug,product_id,price_bucket,device_type,search_query,session_id,target_next_category_slug
+user_0001,2026-01-09T03:48:00Z,1,search,ultrabooks,0,unknown,mobile,ultrabook for consulting work,user_0001_sess_01,ultrabooks
+user_0028,2026-02-06T09:05:06Z,2,view_product,smartphones,36,1000_2000,mobile,,user_0028_sess_02,smartphones
+user_0053,2026-03-10T13:05:00Z,1,search,bags-stands,0,unknown,mobile,MOFT stand for daily commute,user_0053_sess_07,bags-stands
+user_0079,2026-03-01T03:10:37Z,4,checkout,bags-stands,94,under_500,desktop,,user_0079_sess_05,bags-stands
+user_0104,2026-02-04T15:46:00Z,3,compare_item,keyboards-mice,79,under_500,desktop,,user_0104_sess_02,
+user_0130,2026-02-13T15:24:45Z,4,chatbot_ask,bags-stands,95,under_500,unknown,Is LiftStand Fold a good pick for ergonomic desk?,user_0130_sess_05,
+user_0158,2026-02-18T07:15:32Z,3,view_product,smartwatches,57,500_1000,unknown,,user_0158_sess_04,smartwatches
+user_0183,2026-02-02T20:12:23Z,2,view_product,business-laptops,3,1000_2000,desktop,,user_0183_sess_03,business-laptops
+user_0207,2026-02-06T19:07:07Z,3,add_to_cart,business-laptops,6,1000_2000,desktop,,user_0207_sess_04,business-laptops
+user_0232,2026-02-02T23:37:34Z,3,add_to_cart,business-laptops,5,1000_2000,desktop,,user_0232_sess_04,business-laptops
+user_0257,2026-02-07T12:58:00Z,1,search,smartphones,0,unknown,desktop,iphone for travel photos,user_0257_sess_07,smartphones
+user_0283,2026-02-07T15:25:00Z,1,search,tablets,0,unknown,tablet,best may tinh bang mid range,user_0283_sess_06,tablets
+user_0311,2026-02-04T11:51:00Z,1,search,smartphones,0,unknown,mobile,android for creator content,user_0311_sess_05,smartphones
+user_0337,2026-01-10T23:23:53Z,5,pay_order,chargers-cables,83,under_500,mobile,,user_0337_sess_01,
+user_0363,2026-03-02T16:35:41Z,4,save_item,smartphones,32,1000_2000,desktop,,user_0363_sess_04,
+user_0391,2026-02-15T08:51:00Z,1,search,bags-stands,0,unknown,desktop,best gia do under 500,user_0391_sess_02,bags-stands
+user_0421,2026-01-16T21:46:00Z,1,search,tablets,0,unknown,tablet,Xiaomi ipad for portable drawing,user_0421_sess_03,tablets
+user_0448,2026-02-16T15:22:22Z,2,view_product,ultrabooks,24,1000_2000,desktop,,user_0448_sess_02,ultrabooks
+user_0474,2026-02-22T23:41:50Z,4,checkout,bags-stands,96,under_500,tablet,,user_0474_sess_04,bags-stands
+user_0500,2026-02-27T09:48:00Z,4,chatbot_ask,tablets,49,1000_2000,tablet,Would Surface Pro Flex work well for portable drawing and travel?,user_0500_sess_07,

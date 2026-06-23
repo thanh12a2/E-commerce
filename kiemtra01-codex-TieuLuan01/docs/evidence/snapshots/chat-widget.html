@@ -1,0 +1,1290 @@
+<!doctype html>
+<html lang="en">
+<head><base href="http://localhost:8000/"><style>[data-reveal]{opacity:1!important;transform:none!important} .assist-panel{opacity:0;transform:translateY(16px) scale(0.98);pointer-events:none} .assist-panel.is-open{opacity:1!important;transform:none!important;pointer-events:auto!important} .assist-shell{position:fixed!important;right:22px!important;bottom:22px!important}</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Customer Dashboard</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body class="store-body">
+  <div class="promo-strip" aria-hidden="true">
+    <span>Get a 20% discount</span>
+    <span>USE CODE 20PD</span>
+    <span>Get a 20% discount</span>
+    <span>USE CODE 20PD</span>
+    <span>Get a 20% discount</span>
+    <span>USE CODE 20PD</span>
+    <span>Get a 20% discount</span>
+    <span>USE CODE 20PD</span>
+  </div>
+
+  <header class="top-nav-wrap">
+    <div class="top-nav shell">
+      <a class="logo-mark" href="/customer/dashboard/" aria-label="Home">UN</a>
+      <nav class="menu-pill" aria-label="Main">
+        <a href="/customer/dashboard/#section-categories">Categories</a>
+        <a href="/customer/dashboard/#section-products">Products</a>
+        <a href="/customer/dashboard/#section-stories">Blogs</a>
+        <a href="/customer/dashboard/#section-newsletter">Newsletter</a>
+      </nav>
+      <div class="nav-actions">
+        <a class="ghost-btn" href="/customer/cart/">Cart</a>
+        <a class="ghost-btn" href="/customer/saved/">Saved</a>
+        <a class="ghost-btn" href="/customer/orders/">Orders</a>
+        <a class="ghost-btn" href="/customer/compare/">Compare</a>
+        <a class="ghost-btn" href="/customer/logout/">Logout</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-wrap shell page-enter">
+    
+
+    
+<section class="hero-landing" data-reveal>
+  <span class="hero-tag">Customer Portal</span>
+  <h1>Find Your Next <em>Tech Upgrade</em></h1>
+  <p>Browse the unified catalog with cleaner filters, faster actions, and category-aware links.</p>
+  <div class="hero-cta-row">
+    <a class="cta-dark" href="#section-products">Shop Products</a>
+    <a class="cta-light" href="/customer/cart/">Cart (0)</a>
+  </div>
+</section>
+
+<section id="section-categories" class="category-grid-wrap" data-reveal>
+  <div class="section-head center">
+    <span>Categories</span>
+    <h2>Browse by <em>Category</em></h2>
+    <p>Start with the category that fits your workflow.</p>
+  </div>
+  <div class="category-grid">
+    
+    <article class="category-card">
+      <h3>Business Laptops</h3>
+      <p>Reliable laptops for office, remote teams, and productivity-heavy workflows.</p>
+      <a href="/customer/dashboard/?category=business-laptops#section-products">View Business Laptops</a>
+    </article>
+    
+    <article class="category-card">
+      <h3>Gaming Laptops</h3>
+      <p>High-performance gaming notebooks with dedicated graphics and cooling headroom.</p>
+      <a href="/customer/dashboard/?category=gaming-laptops#section-products">View Gaming Laptops</a>
+    </article>
+    
+    <article class="category-card">
+      <h3>Ultrabooks</h3>
+      <p>Lightweight premium laptops optimized for mobility, battery life, and clean design.</p>
+      <a href="/customer/dashboard/?category=ultrabooks#section-products">View Ultrabooks</a>
+    </article>
+    
+    <article class="category-card">
+      <h3>Smartphones</h3>
+      <p>Modern phones for photography, communication, productivity, and social media creation.</p>
+      <a href="/customer/dashboard/?category=smartphones#section-products">View Smartphones</a>
+    </article>
+    
+    <article class="category-card">
+      <h3>Tablets</h3>
+      <p>Portable tablets for note-taking, drawing, media, and flexible productivity.</p>
+      <a href="/customer/dashboard/?category=tablets#section-products">View Tablets</a>
+    </article>
+    
+    <article class="category-card">
+      <h3>Smartwatches</h3>
+      <p>Health, fitness, and notification-focused wearables for daily convenience.</p>
+      <a href="/customer/dashboard/?category=smartwatches#section-products">View Smartwatches</a>
+    </article>
+    
+  </div>
+</section>
+
+<section class="filters-wrap" data-reveal>
+  <div class="section-head">
+    <span>Filters</span>
+    <h2>Refine <em>Results</em></h2>
+  </div>
+  <form class="filters-toolbar" method="get" action="/customer/dashboard/#section-products">
+    <div class="field-group field-search">
+      <label for="id_q">Search</label>
+      <input type="text" name="q" value="phone" maxlength="120" placeholder="Search product name, brand, or category..." class="product-field-input" id="id_q">
+    </div>
+    <div class="field-group">
+      <label for="id_category">Category</label>
+      <select name="category" class="product-field-select" id="id_category">
+  <option value="all">All categories</option>
+
+  <option value="business-laptops">Business Laptops</option>
+
+  <option value="gaming-laptops">Gaming Laptops</option>
+
+  <option value="ultrabooks">Ultrabooks</option>
+
+  <option value="smartphones">Smartphones</option>
+
+  <option value="tablets">Tablets</option>
+
+  <option value="smartwatches">Smartwatches</option>
+
+  <option value="audio">Audio</option>
+
+  <option value="keyboards-mice">Keyboards &amp; Mice</option>
+
+  <option value="chargers-cables">Chargers &amp; Cables</option>
+
+  <option value="bags-stands">Bags &amp; Stands</option>
+
+</select>
+    </div>
+    <div class="field-group">
+      <label for="id_stock">Stock</label>
+      <select name="stock" class="product-field-select" id="id_stock">
+  <option value="all">All</option>
+
+  <option value="in_stock">In stock</option>
+
+</select>
+    </div>
+    <div class="field-group">
+      <label for="id_price_range">Price</label>
+      <select name="price_range" class="product-field-select" id="id_price_range">
+  <option value="all">Any price</option>
+
+  <option value="under_500">Under 500</option>
+
+  <option value="500_1000">500 - 1000</option>
+
+  <option value="1000_2000">1000 - 2000</option>
+
+  <option value="above_2000">Above 2000</option>
+
+</select>
+    </div>
+    <div class="field-group">
+      <label for="id_sort">Sort</label>
+      <select name="sort" class="product-field-select" id="id_sort">
+  <option value="newest">Newest</option>
+
+  <option value="price_low_high">Price: low to high</option>
+
+  <option value="price_high_low">Price: high to low</option>
+
+  <option value="name_az">Name A-Z</option>
+
+  <option value="name_za">Name Z-A</option>
+
+</select>
+    </div>
+    <div class="field-group">
+      <label for="id_brand">Brand</label>
+      <select name="brand" class="product-field-select" id="id_brand">
+  <option value="all">All brands</option>
+
+  <option value="Anker">Anker</option>
+
+  <option value="Apple">Apple</option>
+
+  <option value="Audio-Technica">Audio-Technica</option>
+
+  <option value="Belkin">Belkin</option>
+
+  <option value="Google">Google</option>
+
+  <option value="HyperX">HyperX</option>
+
+  <option value="MOFT">MOFT</option>
+
+  <option value="OnePlus">OnePlus</option>
+
+  <option value="Samsung">Samsung</option>
+
+  <option value="Sony">Sony</option>
+
+  <option value="Xiaomi">Xiaomi</option>
+
+</select>
+    </div>
+    <div class="field-actions">
+      <button class="cta-dark" type="submit">Apply</button>
+      <a class="cta-light" href="/customer/dashboard/#section-products">Reset</a>
+    </div>
+  </form>
+
+  <div class="filters-active">
+    <strong>Active</strong>
+    <span>Search: phone</span>
+    
+    
+    
+    
+    
+    
+  </div>
+</section>
+
+<section id="section-products" class="products-section" data-reveal>
+  <div class="section-head">
+    <span>Products</span>
+    <h2>Fresh Picks Across <em>All Categories</em></h2>
+    <p>Page 1 of 2</p>
+  </div>
+
+  
+  <section class="ai-block" data-reveal>
+  <div class="ai-block-head">
+    <div>
+      <span>AI Search Layer</span>
+      <h2>AI goi y cho ban</h2>
+      <div class="ai-block-summary">LLM API key is missing, so fallback mode is being used.<br><br>Recommended options:<br>- Tablet Rest Pro (Bags &amp; Stands, MOFT, $59.00, stock 28)<br>- Galaxy Orbit Ultra (Smartphones, Samsung, $1299.00, stock 17)<br>- Galaxy Tab Horizon 11 (Tablets, Samsung, $749.00, stock 24)<br>- MatePad Flow 13 (Tablets, Huawei, $849.00, stock 12)</div>
+    </div>
+    <div class="ai-block-meta">
+      
+      <strong>Source: rule_based</strong>
+      
+      
+      <span>Fallback active</span>
+      
+    </div>
+  </div>
+
+  
+  <div class="ai-suggestion-grid">
+    
+    <article class="ai-suggestion-card">
+      <a class="ai-suggestion-image" href="/customer/products/bags-stands/98/">
+        <span class="product-service">Bags &amp; Stands</span>
+        <img loading="lazy" src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=8" alt="Tablet Rest Pro">
+      </a>
+      <div class="ai-suggestion-copy">
+        <h3>Tablet Rest Pro</h3>
+        <p>MOFT | Bags &amp; Stands</p>
+      </div>
+      <div class="price-row">
+        <strong>$59.00</strong>
+        <span>Stock: 28</span>
+      </div>
+      <a class="cta-dark" href="/customer/products/bags-stands/98/">View Suggestion</a>
+    </article>
+    
+    <article class="ai-suggestion-card">
+      <a class="ai-suggestion-image" href="/customer/products/smartphones/34/">
+        <span class="product-service">Smartphones</span>
+        <img loading="lazy" src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=4" alt="Galaxy Orbit Ultra">
+      </a>
+      <div class="ai-suggestion-copy">
+        <h3>Galaxy Orbit Ultra</h3>
+        <p>Samsung | Smartphones</p>
+      </div>
+      <div class="price-row">
+        <strong>$1299.00</strong>
+        <span>Stock: 17</span>
+      </div>
+      <a class="cta-dark" href="/customer/products/smartphones/34/">View Suggestion</a>
+    </article>
+    
+    <article class="ai-suggestion-card">
+      <a class="ai-suggestion-image" href="/customer/products/tablets/43/">
+        <span class="product-service">Tablets</span>
+        <img loading="lazy" src="https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=3" alt="Galaxy Tab Horizon 11">
+      </a>
+      <div class="ai-suggestion-copy">
+        <h3>Galaxy Tab Horizon 11</h3>
+        <p>Samsung | Tablets</p>
+      </div>
+      <div class="price-row">
+        <strong>$749.00</strong>
+        <span>Stock: 24</span>
+      </div>
+      <a class="cta-dark" href="/customer/products/tablets/43/">View Suggestion</a>
+    </article>
+    
+    <article class="ai-suggestion-card">
+      <a class="ai-suggestion-image" href="/customer/products/tablets/47/">
+        <span class="product-service">Tablets</span>
+        <img loading="lazy" src="https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=7" alt="MatePad Flow 13">
+      </a>
+      <div class="ai-suggestion-copy">
+        <h3>MatePad Flow 13</h3>
+        <p>Huawei | Tablets</p>
+      </div>
+      <div class="price-row">
+        <strong>$849.00</strong>
+        <span>Stock: 12</span>
+      </div>
+      <a class="cta-dark" href="/customer/products/tablets/47/">View Suggestion</a>
+    </article>
+    
+  </div>
+  
+
+  
+  <div class="ai-citation-row">
+    
+    <a href="/customer/products/bags-stands/97/">Behavior graph</a>
+    
+    <a href="/customer/products/bags-stands/97/">Product catalog</a>
+    
+    <a href="/customer/products/smartphones/34/">Product catalog</a>
+    
+  </div>
+  
+</section>
+
+  
+
+  
+  <div class="product-grid">
+    
+    <article class="store-card" data-reveal>
+      <a class="product-image" href="/customer/products/bags-stands/97/">
+        <span class="product-service">Bags &amp; Stands</span>
+        <img loading="lazy" src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=7" alt="Tablet Rest Mini">
+      </a>
+      <div class="product-meta">
+        <h3>Tablet Rest Mini</h3>
+        <p>MOFT | Bags &amp; Stands</p>
+        <p>Compact folding stand for tablets, e-readers, and phones.</p>
+      </div>
+      <div class="price-row">
+        <strong>$39.00</strong>
+        <span>Stock: 43</span>
+      </div>
+
+      <form class="add-form" method="post" action="/customer/cart/add/">
+        <input type="hidden" name="csrfmiddlewaretoken" value="2leVBAY5Dp9Qug4uz1JNtwoTMpko0ZwHRCVdZajgkZo2uW10f66BTXLtp0MbzV7y">
+        <input type="hidden" name="next" value="/customer/dashboard/?q=phone#section-products">
+        <input type="hidden" name="category_slug" value="bags-stands">
+        <input type="hidden" name="category_name" value="Bags &amp; Stands">
+        <input type="hidden" name="product_id" value="97">
+        <input type="hidden" name="product_name" value="Tablet Rest Mini">
+        <input type="hidden" name="product_brand" value="MOFT">
+        <input type="hidden" name="product_image_url" value="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=7">
+        <input type="hidden" name="unit_price" value="39.00">
+        <input type="hidden" name="stock" value="43">
+        <button type="submit" class="cta-dark">Add To Cart</button>
+      </form>
+
+      <div class="card-actions-row">
+        <form class="add-form-inline" method="post" action="/customer/saved/toggle/">
+          <input type="hidden" name="csrfmiddlewaretoken" value="2leVBAY5Dp9Qug4uz1JNtwoTMpko0ZwHRCVdZajgkZo2uW10f66BTXLtp0MbzV7y">
+          <input type="hidden" name="next" value="/customer/dashboard/?q=phone#section-products">
+          <input type="hidden" name="category_slug" value="bags-stands">
+          <input type="hidden" name="category_name" value="Bags &amp; Stands">
+          <input type="hidden" name="product_id" value="97">
+          <input type="hidden" name="product_name" value="Tablet Rest Mini">
+          <input type="hidden" name="product_brand" value="MOFT">
+          <input type="hidden" name="product_image_url" value="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=7">
+          <input type="hidden" name="unit_price" value="39.00">
+          <input type="hidden" name="stock" value="43">
+          <button class="cta-light" type="submit">Save</button>
+        </form>
+        <form class="add-form-inline" method="post" action="/customer/compare/toggle/">
+          <input type="hidden" name="csrfmiddlewaretoken" value="2leVBAY5Dp9Qug4uz1JNtwoTMpko0ZwHRCVdZajgkZo2uW10f66BTXLtp0MbzV7y">
+          <input type="hidden" name="next" value="/customer/dashboard/?q=phone#section-products">
+          <input type="hidden" name="category_slug" value="bags-stands">
+          <input type="hidden" name="category_name" value="Bags &amp; Stands">
+          <input type="hidden" name="product_id" value="97">
+          <input type="hidden" name="product_name" value="Tablet Rest Mini">
+          <input type="hidden" name="product_brand" value="MOFT">
+          <input type="hidden" name="product_image_url" value="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=7">
+          <input type="hidden" name="unit_price" value="39.00">
+          <input type="hidden" name="stock" value="43">
+          <button class="cta-light" type="submit">Compare</button>
+        </form>
+      </div>
+
+      <a class="cta-light details-btn" href="/customer/products/bags-stands/97/">View Details</a>
+    </article>
+    
+    <article class="store-card" data-reveal>
+      <a class="product-image" href="/customer/products/chargers-cables/83/">
+        <span class="product-service">Chargers &amp; Cables</span>
+        <img loading="lazy" src="https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=3" alt="MagPad Duo">
+      </a>
+      <div class="product-meta">
+        <h3>MagPad Duo</h3>
+        <p>Belkin | Chargers &amp; Cables</p>
+        <p>Wireless charging pad for phone and smartwatch combos.</p>
+      </div>
+      <div class="price-row">
+        <strong>$79.00</strong>
+        <span>Stock: 35</span>
+      </div>
+
+      <form class="add-form" method="post" action="/customer/cart/add/">
+        <input type="hidden" name="csrfmiddlewaretoken" value="2leVBAY5Dp9Qug4uz1JNtwoTMpko0ZwHRCVdZajgkZo2uW10f66BTXLtp0MbzV7y">
+        <input type="hidden" name="next" value="/customer/dashboard/?q=phone#section-products">
+        <input type="hidden" name="category_slug" value="chargers-cables">
+        <input type="hidden" name="category_name" value="Chargers &amp; Cables">
+        <input type="hidden" name="product_id" value="83">
+        <input type="hidden" name="product_name" value="MagPad Duo">
+        <input type="hidden" name="product_brand" value="Belkin">
+        <input type="hidden" name="product_image_url" value="https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=3">
+        <input type="hidden" name="unit_price" value="79.00">
+        <input type="hidden" name="stock" value="35">
+        <button type="submit" class="cta-dark">Add To Cart</button>
+      </form>
+
+      <div class="card-actions-row">
+        <form class="add-form-inline" method="post" action="/customer/saved/toggle/">
+          <input type="hidden" name="csrfmiddlewaretoken" value="2leVBAY5Dp9Qug4uz1JNtwoTMpko0ZwHRCVdZajgkZo2uW10f66BTXLtp0MbzV7y">
+          <input type="hidden" name="next" value="/customer/dashboard/?q=phone#section-products">
+          <input type="hidden" name="category_slug" value="chargers-cables">
+          <input type="hidden" name="category_name" value="Chargers &amp; Cables">
+          <input type="hidden" name="product_id" value="83">
+          <input type="hidden" name="product_name" value="MagPad Duo">
+          <input type="hidden" name="product_brand" value="Belkin">
+          <input type="hidden" name="product_image_url" value="https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=3">
+          <input type="hidden" name="unit_price" value="79.00">
+          <input type="hidden" name="stock" value="35">
+          <button class="cta-light" type="submit">Save</button>
+        </form>
+        <form class="add-form-inline" method="post" action="/customer/compare/toggle/">
+          <input type="hidden" name="csrfmiddlewaretoken" value="2leVBAY5Dp9Qug4uz1JNtwoTMpko0ZwHRCVdZajgkZo2uW10f66BTXLtp0MbzV7y">
+          <input type="hidden" name="next" value="/customer/dashboard/?q=phone#section-products">
+          <input type="hidden" name="category_slug" value="chargers-cables">
+          <input type="hidden" name="category_name" value="Chargers &amp; Cables">
+          <input type="hidden" name="product_id" value="83">
+          <input type="hidden" name="product_name" value="MagPad Duo">
+          <input type="hidden" name="product_brand" value="Belkin">
+          <input type="hidden" name="product_image_url" value="https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=3">
+          <input type="hidden" name="unit_price" value="79.00">
+          <input type="hidden" name="stock" value="35">
+          <button class="cta-light" type="submit">Compare</button>
+        </form>
+      </div>
+
+      <a class="cta-light details-btn" href="/customer/products/chargers-cables/83/">View Details</a>
+    </article>
+    
+    <article class="store-card" data-reveal>
+      <a class="product-image" href="/customer/products/chargers-cables/81/">
+        <span class="product-service">Chargers &amp; Cables</span>
+        <img loading="lazy" src="https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=1" alt="PowerBrick 65W">
+      </a>
+      <div class="product-meta">
+        <h3>PowerBrick 65W</h3>
+        <p>Anker | Chargers &amp; Cables</p>
+        <p>Compact charger for phones, tablets, and light laptops.</p>
+      </div>
+      <div class="price-row">
+        <strong>$49.00</strong>
+        <span>Stock: 63</span>
+      </div>
+
+      <form class="add-form" method="post" action="/customer/cart/add/">
+        <input type="hidden" name="csrfmiddlewaretoken" value="2leVBAY5Dp9Qug4uz1JNtwoTMpko0ZwHRCVdZajgkZo2uW10f66BTXLtp0MbzV7y">
+        <input type="hidden" name="next" value="/customer/dashboard/?q=phone#section-products">
+        <input type="hidden" name="category_slug" value="chargers-cables">
+        <input type="hidden" name="category_name" value="Chargers &amp; Cables">
+        <input type="hidden" name="product_id" value="81">
+        <input type="hidden" name="product_name" value="PowerBrick 65W">
+        <input type="hidden" name="product_brand" value="Anker">
+        <input type="hidden" name="product_image_url" value="https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=1">
+        <input type="hidden" name="unit_price" value="49.00">
+        <input type="hidden" name="stock" value="63">
+        <button type="submit" class="cta-dark">Add To Cart</button>
+      </form>
+
+      <div class="card-actions-row">
+        <form class="add-form-inline" method="post" action="/customer/saved/toggle/">
+          <input type="hidden" name="csrfmiddlewaretoken" value="2leVBAY5Dp9Qug4uz1JNtwoTMpko0ZwHRCVdZajgkZo2uW10f66BTXLtp0MbzV7y">
+          <input type="hidden" name="next" value="/customer/dashboard/?q=phone#section-products">
+          <input type="hidden" name="category_slug" value="chargers-cables">
+          <input type="hidden" name="category_name" value="Chargers &amp; Cables">
+          <input type="hidden" name="product_id" value="81">
+          <input type="hidden" name="product_name" value="PowerBrick 65W">
+          <input type="hidden" name="product_brand" value="Anker">
+          <input type="hidden" name="product_image_url" value="https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=1">
+          <input type="hidden" name="unit_price" value="49.00">
+          <input type="hidden" name="stock" value="63">
+          <button class="cta-light" type="submit">Save</button>
+        </form>
+        <form class="add-form-inline" method="post" action="/customer/compare/toggle/">
+          <input type="hidden" name="csrfmiddlewaretoken" value="2leVBAY5Dp9Qug4uz1JNtwoTMpko0ZwHRCVdZajgkZo2uW10f66BTXLtp0MbzV7y">
+          <input type="hidden" name="next" value="/customer/dashboard/?q=phone#section-products">
+          <input type="hidden" name="category_slug" value="chargers-cables">
+          <input type="hidden" name="category_name" value="Chargers &amp; Cables">
+          <input type="hidden" name="product_id" value="81">
+          <input type="hidden" name="product_name" value="PowerBrick 65W">
+          <input type="hidden" name="product_brand" value="Anker">
+          <input type="hidden" name="product_image_url" value="https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=1">
+          <input type="hidden" name="unit_price" value="49.00">
+          <input type="hidden" name="stock" value="63">
+          <button class="cta-light" type="submit">Compare</button>
+        </form>
+      </div>
+
+      <a class="cta-light details-btn" href="/customer/products/chargers-cables/81/">View Details</a>
+    </article>
+    
+    <article class="store-card" data-reveal>
+      <a class="product-image" href="/customer/products/audio/70/">
+        <span class="product-service">Audio</span>
+        <img loading="lazy" src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=10" alt="Studio Monitor Two">
+      </a>
+      <div class="product-meta">
+        <h3>Studio Monitor Two</h3>
+        <p>Audio-Technica | Audio</p>
+        <p>Refined monitoring headphones for creators and engineers.</p>
+      </div>
+      <div class="price-row">
+        <strong>$239.00</strong>
+        <span>Stock: 11</span>
+      </div>
+
+      <form class="add-form" method="post" action="/customer/cart/add/">
+        <input type="hidden" name="csrfmiddlewaretoken" value="2leVBAY5Dp9Qug4uz1JNtwoTMpko0ZwHRCVdZajgkZo2uW10f66BTXLtp0MbzV7y">
+        <input type="hidden" name="next" value="/customer/dashboard/?q=phone#section-products">
+        <input type="hidden" name="category_slug" value="audio">
+        <input type="hidden" name="category_name" value="Audio">
+        <input type="hidden" name="product_id" value="70">
+        <input type="hidden" name="product_name" value="Studio Monitor Two">
+        <input type="hidden" name="product_brand" value="Audio-Technica">
+        <input type="hidden" name="product_image_url" value="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=10">
+        <input type="hidden" name="unit_price" value="239.00">
+        <input type="hidden" name="stock" value="11">
+        <button type="submit" class="cta-dark">Add To Cart</button>
+      </form>
+
+      <div class="card-actions-row">
+        <form class="add-form-inline" method="post" action="/customer/saved/toggle/">
+          <input type="hidden" name="csrfmiddlewaretoken" value="2leVBAY5Dp9Qug4uz1JNtwoTMpko0ZwHRCVdZajgkZo2uW10f66BTXLtp0MbzV7y">
+          <input type="hidden" name="next" value="/customer/dashboard/?q=phone#section-products">
+          <input type="hidden" name="category_slug" value="audio">
+          <input type="hidden" name="category_name" value="Audio">
+          <input type="hidden" name="product_id" value="70">
+          <input type="hidden" name="product_name" value="Studio Monitor Two">
+          <input type="hidden" name="product_brand" value="Audio-Technica">
+          <input type="hidden" name="product_image_url" value="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=10">
+          <input type="hidden" name="unit_price" value="239.00">
+          <input type="hidden" name="stock" value="11">
+          <button class="cta-light" type="submit">Save</button>
+        </form>
+        <form class="add-form-inline" method="post" action="/customer/compare/toggle/">
+          <input type="hidden" name="csrfmiddlewaretoken" value="2leVBAY5Dp9Qug4uz1JNtwoTMpko0ZwHRCVdZajgkZo2uW10f66BTXLtp0MbzV7y">
+          <input type="hidden" name="next" value="/customer/dashboard/?q=phone#section-products">
+          <input type="hidden" name="category_slug" value="audio">
+          <input type="hidden" name="category_name" value="Audio">
+          <input type="hidden" name="product_id" value="70">
+          <input type="hidden" name="product_name" value="Studio Monitor Two">
+          <input type="hidden" name="product_brand" value="Audio-Technica">
+          <input type="hidden" name="product_image_url" value="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=10">
+          <input type="hidden" name="unit_price" value="239.00">
+          <input type="hidden" name="stock" value="11">
+          <button class="cta-light" type="submit">Compare</button>
+        </form>
+      </div>
+
+      <a class="cta-light details-btn" href="/customer/products/audio/70/">View Details</a>
+    </article>
+    
+    <article class="store-card" data-reveal>
+      <a class="product-image" href="/customer/products/audio/69/">
+        <span class="product-service">Audio</span>
+        <img loading="lazy" src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=9" alt="Studio Monitor One">
+      </a>
+      <div class="product-meta">
+        <h3>Studio Monitor One</h3>
+        <p>Audio-Technica | Audio</p>
+        <p>Neutral over-ear headphones for editing and focused listening.</p>
+      </div>
+      <div class="price-row">
+        <strong>$179.00</strong>
+        <span>Stock: 17</span>
+      </div>
+
+      <form class="add-form" method="post" action="/customer/cart/add/">
+        <input type="hidden" name="csrfmiddlewaretoken" value="2leVBAY5Dp9Qug4uz1JNtwoTMpko0ZwHRCVdZajgkZo2uW10f66BTXLtp0MbzV7y">
+        <input type="hidden" name="next" value="/customer/dashboard/?q=phone#section-products">
+        <input type="hidden" name="category_slug" value="audio">
+        <input type="hidden" name="category_name" value="Audio">
+        <input type="hidden" name="product_id" value="69">
+        <input type="hidden" name="product_name" value="Studio Monitor One">
+        <input type="hidden" name="product_brand" value="Audio-Technica">
+        <input type="hidden" name="product_image_url" value="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=9">
+        <input type="hidden" name="unit_price" value="179.00">
+        <input type="hidden" name="stock" value="17">
+        <button type="submit" class="cta-dark">Add To Cart</button>
+      </form>
+
+      <div class="card-actions-row">
+        <form class="add-form-inline" method="post" action="/customer/saved/toggle/">
+          <input type="hidden" name="csrfmiddlewaretoken" value="2leVBAY5Dp9Qug4uz1JNtwoTMpko0ZwHRCVdZajgkZo2uW10f66BTXLtp0MbzV7y">
+          <input type="hidden" name="next" value="/customer/dashboard/?q=phone#section-products">
+          <input type="hidden" name="category_slug" value="audio">
+          <input type="hidden" name="category_name" value="Audio">
+          <input type="hidden" name="product_id" value="69">
+          <input type="hidden" name="product_name" value="Studio Monitor One">
+          <input type="hidden" name="product_brand" value="Audio-Technica">
+          <input type="hidden" name="product_image_url" value="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=9">
+          <input type="hidden" name="unit_price" value="179.00">
+          <input type="hidden" name="stock" value="17">
+          <button class="cta-light" type="submit">Save</button>
+        </form>
+        <form class="add-form-inline" method="post" action="/customer/compare/toggle/">
+          <input type="hidden" name="csrfmiddlewaretoken" value="2leVBAY5Dp9Qug4uz1JNtwoTMpko0ZwHRCVdZajgkZo2uW10f66BTXLtp0MbzV7y">
+          <input type="hidden" name="next" value="/customer/dashboard/?q=phone#section-products">
+          <input type="hidden" name="category_slug" value="audio">
+          <input type="hidden" name="category_name" value="Audio">
+          <input type="hidden" name="product_id" value="69">
+          <input type="hidden" name="product_name" value="Studio Monitor One">
+          <input type="hidden" name="product_brand" value="Audio-Technica">
+          <input type="hidden" name="product_image_url" value="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=9">
+          <input type="hidden" name="unit_price" value="179.00">
+          <input type="hidden" name="stock" value="17">
+          <button class="cta-light" type="submit">Compare</button>
+        </form>
+      </div>
+
+      <a class="cta-light details-btn" href="/customer/products/audio/69/">View Details</a>
+    </article>
+    
+    <article class="store-card" data-reveal>
+      <a class="product-image" href="/customer/products/audio/66/">
+        <span class="product-service">Audio</span>
+        <img loading="lazy" src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=6" alt="StreamMic Plus">
+      </a>
+      <div class="product-meta">
+        <h3>StreamMic Plus</h3>
+        <p>HyperX | Audio</p>
+        <p>Higher-end microphone with better gain control and clarity.</p>
+      </div>
+      <div class="price-row">
+        <strong>$149.00</strong>
+        <span>Stock: 14</span>
+      </div>
+
+      <form class="add-form" method="post" action="/customer/cart/add/">
+        <input type="hidden" name="csrfmiddlewaretoken" value="2leVBAY5Dp9Qug4uz1JNtwoTMpko0ZwHRCVdZajgkZo2uW10f66BTXLtp0MbzV7y">
+        <input type="hidden" name="next" value="/customer/dashboard/?q=phone#section-products">
+        <input type="hidden" name="category_slug" value="audio">
+        <input type="hidden" name="category_name" value="Audio">
+        <input type="hidden" name="product_id" value="66">
+        <input type="hidden" name="product_name" value="StreamMic Plus">
+        <input type="hidden" name="product_brand" value="HyperX">
+        <input type="hidden" name="product_image_url" value="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=6">
+        <input type="hidden" name="unit_price" value="149.00">
+        <input type="hidden" name="stock" value="14">
+        <button type="submit" class="cta-dark">Add To Cart</button>
+      </form>
+
+      <div class="card-actions-row">
+        <form class="add-form-inline" method="post" action="/customer/saved/toggle/">
+          <input type="hidden" name="csrfmiddlewaretoken" value="2leVBAY5Dp9Qug4uz1JNtwoTMpko0ZwHRCVdZajgkZo2uW10f66BTXLtp0MbzV7y">
+          <input type="hidden" name="next" value="/customer/dashboard/?q=phone#section-products">
+          <input type="hidden" name="category_slug" value="audio">
+          <input type="hidden" name="category_name" value="Audio">
+          <input type="hidden" name="product_id" value="66">
+          <input type="hidden" name="product_name" value="StreamMic Plus">
+          <input type="hidden" name="product_brand" value="HyperX">
+          <input type="hidden" name="product_image_url" value="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=6">
+          <input type="hidden" name="unit_price" value="149.00">
+          <input type="hidden" name="stock" value="14">
+          <button class="cta-light" type="submit">Save</button>
+        </form>
+        <form class="add-form-inline" method="post" action="/customer/compare/toggle/">
+          <input type="hidden" name="csrfmiddlewaretoken" value="2leVBAY5Dp9Qug4uz1JNtwoTMpko0ZwHRCVdZajgkZo2uW10f66BTXLtp0MbzV7y">
+          <input type="hidden" name="next" value="/customer/dashboard/?q=phone#section-products">
+          <input type="hidden" name="category_slug" value="audio">
+          <input type="hidden" name="category_name" value="Audio">
+          <input type="hidden" name="product_id" value="66">
+          <input type="hidden" name="product_name" value="StreamMic Plus">
+          <input type="hidden" name="product_brand" value="HyperX">
+          <input type="hidden" name="product_image_url" value="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=6">
+          <input type="hidden" name="unit_price" value="149.00">
+          <input type="hidden" name="stock" value="14">
+          <button class="cta-light" type="submit">Compare</button>
+        </form>
+      </div>
+
+      <a class="cta-light details-btn" href="/customer/products/audio/66/">View Details</a>
+    </article>
+    
+    <article class="store-card" data-reveal>
+      <a class="product-image" href="/customer/products/audio/61/">
+        <span class="product-service">Audio</span>
+        <img loading="lazy" src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=1" alt="QuietBeat ANC">
+      </a>
+      <div class="product-meta">
+        <h3>QuietBeat ANC</h3>
+        <p>Sony | Audio</p>
+        <p>Noise-cancelling headphones for travel, focus, and meetings.</p>
+      </div>
+      <div class="price-row">
+        <strong>$249.00</strong>
+        <span>Stock: 27</span>
+      </div>
+
+      <form class="add-form" method="post" action="/customer/cart/add/">
+        <input type="hidden" name="csrfmiddlewaretoken" value="2leVBAY5Dp9Qug4uz1JNtwoTMpko0ZwHRCVdZajgkZo2uW10f66BTXLtp0MbzV7y">
+        <input type="hidden" name="next" value="/customer/dashboard/?q=phone#section-products">
+        <input type="hidden" name="category_slug" value="audio">
+        <input type="hidden" name="category_name" value="Audio">
+        <input type="hidden" name="product_id" value="61">
+        <input type="hidden" name="product_name" value="QuietBeat ANC">
+        <input type="hidden" name="product_brand" value="Sony">
+        <input type="hidden" name="product_image_url" value="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=1">
+        <input type="hidden" name="unit_price" value="249.00">
+        <input type="hidden" name="stock" value="27">
+        <button type="submit" class="cta-dark">Add To Cart</button>
+      </form>
+
+      <div class="card-actions-row">
+        <form class="add-form-inline" method="post" action="/customer/saved/toggle/">
+          <input type="hidden" name="csrfmiddlewaretoken" value="2leVBAY5Dp9Qug4uz1JNtwoTMpko0ZwHRCVdZajgkZo2uW10f66BTXLtp0MbzV7y">
+          <input type="hidden" name="next" value="/customer/dashboard/?q=phone#section-products">
+          <input type="hidden" name="category_slug" value="audio">
+          <input type="hidden" name="category_name" value="Audio">
+          <input type="hidden" name="product_id" value="61">
+          <input type="hidden" name="product_name" value="QuietBeat ANC">
+          <input type="hidden" name="product_brand" value="Sony">
+          <input type="hidden" name="product_image_url" value="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=1">
+          <input type="hidden" name="unit_price" value="249.00">
+          <input type="hidden" name="stock" value="27">
+          <button class="cta-light" type="submit">Save</button>
+        </form>
+        <form class="add-form-inline" method="post" action="/customer/compare/toggle/">
+          <input type="hidden" name="csrfmiddlewaretoken" value="2leVBAY5Dp9Qug4uz1JNtwoTMpko0ZwHRCVdZajgkZo2uW10f66BTXLtp0MbzV7y">
+          <input type="hidden" name="next" value="/customer/dashboard/?q=phone#section-products">
+          <input type="hidden" name="category_slug" value="audio">
+          <input type="hidden" name="category_name" value="Audio">
+          <input type="hidden" name="product_id" value="61">
+          <input type="hidden" name="product_name" value="QuietBeat ANC">
+          <input type="hidden" name="product_brand" value="Sony">
+          <input type="hidden" name="product_image_url" value="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=1">
+          <input type="hidden" name="unit_price" value="249.00">
+          <input type="hidden" name="stock" value="27">
+          <button class="cta-light" type="submit">Compare</button>
+        </form>
+      </div>
+
+      <a class="cta-light details-btn" href="/customer/products/audio/61/">View Details</a>
+    </article>
+    
+    <article class="store-card" data-reveal>
+      <a class="product-image" href="/customer/products/smartphones/40/">
+        <span class="product-service">Smartphones</span>
+        <img loading="lazy" src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=10" alt="Nova Lite 14 Pro">
+      </a>
+      <div class="product-meta">
+        <h3>Nova Lite 14 Pro</h3>
+        <p>Xiaomi | Smartphones</p>
+        <p>Upgraded camera and processor for creator-friendly workflows.</p>
+      </div>
+      <div class="price-row">
+        <strong>$729.00</strong>
+        <span>Stock: 31</span>
+      </div>
+
+      <form class="add-form" method="post" action="/customer/cart/add/">
+        <input type="hidden" name="csrfmiddlewaretoken" value="2leVBAY5Dp9Qug4uz1JNtwoTMpko0ZwHRCVdZajgkZo2uW10f66BTXLtp0MbzV7y">
+        <input type="hidden" name="next" value="/customer/dashboard/?q=phone#section-products">
+        <input type="hidden" name="category_slug" value="smartphones">
+        <input type="hidden" name="category_name" value="Smartphones">
+        <input type="hidden" name="product_id" value="40">
+        <input type="hidden" name="product_name" value="Nova Lite 14 Pro">
+        <input type="hidden" name="product_brand" value="Xiaomi">
+        <input type="hidden" name="product_image_url" value="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=10">
+        <input type="hidden" name="unit_price" value="729.00">
+        <input type="hidden" name="stock" value="31">
+        <button type="submit" class="cta-dark">Add To Cart</button>
+      </form>
+
+      <div class="card-actions-row">
+        <form class="add-form-inline" method="post" action="/customer/saved/toggle/">
+          <input type="hidden" name="csrfmiddlewaretoken" value="2leVBAY5Dp9Qug4uz1JNtwoTMpko0ZwHRCVdZajgkZo2uW10f66BTXLtp0MbzV7y">
+          <input type="hidden" name="next" value="/customer/dashboard/?q=phone#section-products">
+          <input type="hidden" name="category_slug" value="smartphones">
+          <input type="hidden" name="category_name" value="Smartphones">
+          <input type="hidden" name="product_id" value="40">
+          <input type="hidden" name="product_name" value="Nova Lite 14 Pro">
+          <input type="hidden" name="product_brand" value="Xiaomi">
+          <input type="hidden" name="product_image_url" value="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=10">
+          <input type="hidden" name="unit_price" value="729.00">
+          <input type="hidden" name="stock" value="31">
+          <button class="cta-light" type="submit">Save</button>
+        </form>
+        <form class="add-form-inline" method="post" action="/customer/compare/toggle/">
+          <input type="hidden" name="csrfmiddlewaretoken" value="2leVBAY5Dp9Qug4uz1JNtwoTMpko0ZwHRCVdZajgkZo2uW10f66BTXLtp0MbzV7y">
+          <input type="hidden" name="next" value="/customer/dashboard/?q=phone#section-products">
+          <input type="hidden" name="category_slug" value="smartphones">
+          <input type="hidden" name="category_name" value="Smartphones">
+          <input type="hidden" name="product_id" value="40">
+          <input type="hidden" name="product_name" value="Nova Lite 14 Pro">
+          <input type="hidden" name="product_brand" value="Xiaomi">
+          <input type="hidden" name="product_image_url" value="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=10">
+          <input type="hidden" name="unit_price" value="729.00">
+          <input type="hidden" name="stock" value="31">
+          <button class="cta-light" type="submit">Compare</button>
+        </form>
+      </div>
+
+      <a class="cta-light details-btn" href="/customer/products/smartphones/40/">View Details</a>
+    </article>
+    
+    <article class="store-card" data-reveal>
+      <a class="product-image" href="/customer/products/smartphones/39/">
+        <span class="product-service">Smartphones</span>
+        <img loading="lazy" src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=9" alt="Nova Lite 14">
+      </a>
+      <div class="product-meta">
+        <h3>Nova Lite 14</h3>
+        <p>Xiaomi | Smartphones</p>
+        <p>Affordable AMOLED smartphone with practical daily speed.</p>
+      </div>
+      <div class="price-row">
+        <strong>$549.00</strong>
+        <span>Stock: 42</span>
+      </div>
+
+      <form class="add-form" method="post" action="/customer/cart/add/">
+        <input type="hidden" name="csrfmiddlewaretoken" value="2leVBAY5Dp9Qug4uz1JNtwoTMpko0ZwHRCVdZajgkZo2uW10f66BTXLtp0MbzV7y">
+        <input type="hidden" name="next" value="/customer/dashboard/?q=phone#section-products">
+        <input type="hidden" name="category_slug" value="smartphones">
+        <input type="hidden" name="category_name" value="Smartphones">
+        <input type="hidden" name="product_id" value="39">
+        <input type="hidden" name="product_name" value="Nova Lite 14">
+        <input type="hidden" name="product_brand" value="Xiaomi">
+        <input type="hidden" name="product_image_url" value="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=9">
+        <input type="hidden" name="unit_price" value="549.00">
+        <input type="hidden" name="stock" value="42">
+        <button type="submit" class="cta-dark">Add To Cart</button>
+      </form>
+
+      <div class="card-actions-row">
+        <form class="add-form-inline" method="post" action="/customer/saved/toggle/">
+          <input type="hidden" name="csrfmiddlewaretoken" value="2leVBAY5Dp9Qug4uz1JNtwoTMpko0ZwHRCVdZajgkZo2uW10f66BTXLtp0MbzV7y">
+          <input type="hidden" name="next" value="/customer/dashboard/?q=phone#section-products">
+          <input type="hidden" name="category_slug" value="smartphones">
+          <input type="hidden" name="category_name" value="Smartphones">
+          <input type="hidden" name="product_id" value="39">
+          <input type="hidden" name="product_name" value="Nova Lite 14">
+          <input type="hidden" name="product_brand" value="Xiaomi">
+          <input type="hidden" name="product_image_url" value="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=9">
+          <input type="hidden" name="unit_price" value="549.00">
+          <input type="hidden" name="stock" value="42">
+          <button class="cta-light" type="submit">Save</button>
+        </form>
+        <form class="add-form-inline" method="post" action="/customer/compare/toggle/">
+          <input type="hidden" name="csrfmiddlewaretoken" value="2leVBAY5Dp9Qug4uz1JNtwoTMpko0ZwHRCVdZajgkZo2uW10f66BTXLtp0MbzV7y">
+          <input type="hidden" name="next" value="/customer/dashboard/?q=phone#section-products">
+          <input type="hidden" name="category_slug" value="smartphones">
+          <input type="hidden" name="category_name" value="Smartphones">
+          <input type="hidden" name="product_id" value="39">
+          <input type="hidden" name="product_name" value="Nova Lite 14">
+          <input type="hidden" name="product_brand" value="Xiaomi">
+          <input type="hidden" name="product_image_url" value="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=9">
+          <input type="hidden" name="unit_price" value="549.00">
+          <input type="hidden" name="stock" value="42">
+          <button class="cta-light" type="submit">Compare</button>
+        </form>
+      </div>
+
+      <a class="cta-light details-btn" href="/customer/products/smartphones/39/">View Details</a>
+    </article>
+    
+  </div>
+
+  
+  <nav class="pager" aria-label="Products pagination">
+    
+    <span class="pager-disabled">Previous</span>
+    
+    <span class="pager-current">Page 1 / 2</span>
+    
+    <a class="cta-light" href="/customer/dashboard/?q=phone&amp;product_page=2#section-products">Next</a>
+    
+  </nav>
+  
+
+  
+</section>
+
+<section class="content-block" data-reveal>
+  <div class="section-head">
+    <span>Best Sellers</span>
+    <h2>Top Picks This <em>Week</em></h2>
+  </div>
+  <div class="product-grid best-seller-grid">
+    
+    <article class="store-card compact-card" data-reveal>
+      <a class="product-image mini-image" href="/customer/products/chargers-cables/85/">
+        <span class="product-service">Chargers &amp; Cables</span>
+        <img loading="lazy" src="https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=5" alt="CableFlex USB-C 1m">
+      </a>
+      <div class="product-meta">
+        <h3>CableFlex USB-C 1m</h3>
+        <p>UGREEN</p>
+      </div>
+      <div class="price-row">
+        <strong>$15.00</strong>
+        <span>Stock: 110</span>
+      </div>
+      <a class="cta-light" href="/customer/products/chargers-cables/85/">Quick View</a>
+    </article>
+    
+    <article class="store-card compact-card" data-reveal>
+      <a class="product-image mini-image" href="/customer/products/chargers-cables/86/">
+        <span class="product-service">Chargers &amp; Cables</span>
+        <img loading="lazy" src="https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=6" alt="CableFlex USB-C 2m">
+      </a>
+      <div class="product-meta">
+        <h3>CableFlex USB-C 2m</h3>
+        <p>UGREEN</p>
+      </div>
+      <div class="price-row">
+        <strong>$19.00</strong>
+        <span>Stock: 98</span>
+      </div>
+      <a class="cta-light" href="/customer/products/chargers-cables/86/">Quick View</a>
+    </article>
+    
+    <article class="store-card compact-card" data-reveal>
+      <a class="product-image mini-image" href="/customer/products/chargers-cables/90/">
+        <span class="product-service">Chargers &amp; Cables</span>
+        <img loading="lazy" src="https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=10" alt="CableKit Organizer">
+      </a>
+      <div class="product-meta">
+        <h3>CableKit Organizer</h3>
+        <p>Native Union</p>
+      </div>
+      <div class="price-row">
+        <strong>$25.00</strong>
+        <span>Stock: 67</span>
+      </div>
+      <a class="cta-light" href="/customer/products/chargers-cables/90/">Quick View</a>
+    </article>
+    
+    <article class="store-card compact-card" data-reveal>
+      <a class="product-image mini-image" href="/customer/products/chargers-cables/81/">
+        <span class="product-service">Chargers &amp; Cables</span>
+        <img loading="lazy" src="https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=1" alt="PowerBrick 65W">
+      </a>
+      <div class="product-meta">
+        <h3>PowerBrick 65W</h3>
+        <p>Anker</p>
+      </div>
+      <div class="price-row">
+        <strong>$49.00</strong>
+        <span>Stock: 63</span>
+      </div>
+      <a class="cta-light" href="/customer/products/chargers-cables/81/">Quick View</a>
+    </article>
+    
+    <article class="store-card compact-card" data-reveal>
+      <a class="product-image mini-image" href="/customer/products/chargers-cables/87/">
+        <span class="product-service">Chargers &amp; Cables</span>
+        <img loading="lazy" src="https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=7" alt="DisplayLink USB-C HDMI">
+      </a>
+      <div class="product-meta">
+        <h3>DisplayLink USB-C HDMI</h3>
+        <p>UGREEN</p>
+      </div>
+      <div class="price-row">
+        <strong>$29.00</strong>
+        <span>Stock: 56</span>
+      </div>
+      <a class="cta-light" href="/customer/products/chargers-cables/87/">Quick View</a>
+    </article>
+    
+    <article class="store-card compact-card" data-reveal>
+      <a class="product-image mini-image" href="/customer/products/bags-stands/93/">
+        <span class="product-service">Bags &amp; Stands</span>
+        <img loading="lazy" src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&amp;fit=crop&amp;w=1400&amp;q=80&amp;product=3" alt="Shield Sleeve 13">
+      </a>
+      <div class="product-meta">
+        <h3>Shield Sleeve 13</h3>
+        <p>Tomtoc</p>
+      </div>
+      <div class="price-row">
+        <strong>$35.00</strong>
+        <span>Stock: 54</span>
+      </div>
+      <a class="cta-light" href="/customer/products/bags-stands/93/">Quick View</a>
+    </article>
+    
+  </div>
+</section>
+
+<section id="section-stories" class="content-block" data-reveal>
+  <div class="section-head center">
+    <span>Stories</span>
+    <h2>Latest <em>Blog Posts</em></h2>
+  </div>
+
+  
+  <div class="story-grid">
+    
+    <article class="story-card" data-reveal>
+      <img loading="lazy" class="story-image" src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&amp;fit=crop&amp;w=1400&amp;q=80" alt="How to Build a Productive Hybrid Workspace in 2026">
+      <p class="story-meta">Workspace | March 21, 2026 | Editorial Team</p>
+      <h3>How to Build a Productive Hybrid Workspace in 2026</h3>
+      <p>A practical blueprint for choosing devices, accessories, and layout habits that improve focus in hybrid teams.</p>
+      <a class="story-link" href="/customer/blog/hybrid-workspace-2026/">Read Article</a>
+    </article>
+    
+    <article class="story-card" data-reveal>
+      <img loading="lazy" class="story-image" src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&amp;fit=crop&amp;w=1400&amp;q=80" alt="Laptop Buying Guide: What Actually Matters for Developers">
+      <p class="story-meta">Buying Guide | March 14, 2026 | Ethan Brooks</p>
+      <h3>Laptop Buying Guide: What Actually Matters for Developers</h3>
+      <p>Processor names can be confusing. This guide simplifies memory, thermal, battery, and display priorities for coding workloads.</p>
+      <a class="story-link" href="/customer/blog/laptop-buying-guide-developers/">Read Article</a>
+    </article>
+    
+    <article class="story-card" data-reveal>
+      <img loading="lazy" class="story-image" src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&amp;fit=crop&amp;w=1400&amp;q=80" alt="Mobile Camera Workflow for Creators on the Go">
+      <p class="story-meta">Mobile | March 8, 2026 | Leila Carter</p>
+      <h3>Mobile Camera Workflow for Creators on the Go</h3>
+      <p>Capture cleaner footage with predictable color and less editing time using a repeatable mobile workflow.</p>
+      <a class="story-link" href="/customer/blog/mobile-camera-workflow-creators/">Read Article</a>
+    </article>
+    
+  </div>
+
+  
+  <nav class="pager" aria-label="Blog pagination">
+    
+    <span class="pager-disabled">Previous</span>
+    
+    <span class="pager-current">Page 1 / 2</span>
+    
+    <a class="cta-light" href="/customer/dashboard/?q=phone&amp;blog_page=2#section-stories">Next</a>
+    
+  </nav>
+  
+
+  
+</section>
+
+<section class="content-block" data-reveal>
+  <div class="section-head center">
+    <span>Testimonials</span>
+    <h2>What Customers <em>Say</em></h2>
+  </div>
+  
+  <div class="product-grid testimonial-grid">
+    
+    <article class="store-card testimonial-card" data-reveal>
+      <div class="testimonial-top">
+        <img loading="lazy" class="testimonial-avatar" src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&amp;fit=crop&amp;w=300&amp;q=80" alt="Leila Carter">
+        <div>
+          <h3>Leila Carter</h3>
+          <p>Content Strategist</p>
+        </div>
+      </div>
+      <p class="stars"></p>
+      <p>I like how related products are shown on detail pages. It helps decision-making without feeling pushy.</p>
+    </article>
+    
+    <article class="store-card testimonial-card" data-reveal>
+      <div class="testimonial-top">
+        <img loading="lazy" class="testimonial-avatar" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&amp;fit=crop&amp;w=300&amp;q=80" alt="Ethan Walker">
+        <div>
+          <h3>Ethan Walker</h3>
+          <p>Brand Designer</p>
+        </div>
+      </div>
+      <p class="stars"></p>
+      <p>Design language is modern and readable. The order flow from cart to payment is straightforward.</p>
+    </article>
+    
+    <article class="store-card testimonial-card" data-reveal>
+      <div class="testimonial-top">
+        <img loading="lazy" class="testimonial-avatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&amp;fit=crop&amp;w=300&amp;q=80" alt="Liam Reed">
+        <div>
+          <h3>Liam Reed</h3>
+          <p>Audio Engineer</p>
+        </div>
+      </div>
+      <p class="stars"></p>
+      <p>I found what I needed quickly with the new filters. Product details are much easier to compare now.</p>
+    </article>
+    
+    <article class="store-card testimonial-card" data-reveal>
+      <div class="testimonial-top">
+        <img loading="lazy" class="testimonial-avatar" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&amp;fit=crop&amp;w=300&amp;q=80" alt="Noah Bennett">
+        <div>
+          <h3>Noah Bennett</h3>
+          <p>Music Producer</p>
+        </div>
+      </div>
+      <p class="stars"></p>
+      <p>Accessories are practical and shipping updates are accurate. The experience has been consistently reliable.</p>
+    </article>
+    
+    <article class="store-card testimonial-card" data-reveal>
+      <div class="testimonial-top">
+        <img loading="lazy" class="testimonial-avatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&amp;fit=crop&amp;w=300&amp;q=80" alt="Ava Mitchell">
+        <div>
+          <h3>Ava Mitchell</h3>
+          <p>Creative Director</p>
+        </div>
+      </div>
+      <p class="stars"></p>
+      <p>The product pages are clear and the checkout process is fast. It feels polished and trustworthy end-to-end.</p>
+    </article>
+    
+  </div>
+  
+</section>
+
+<section id="section-faq" class="content-block" data-reveal>
+  <div class="section-head center">
+    <span>FAQ</span>
+    <h2>Frequently Asked <em>Questions</em></h2>
+  </div>
+  <div class="faq-grid">
+    
+    <article class="faq-item">
+      <h3>Do you ship internationally?</h3>
+      <p>Yes. International shipping is available for selected regions, with shipping fees calculated at checkout.</p>
+    </article>
+    
+    <article class="faq-item">
+      <h3>How long does delivery take?</h3>
+      <p>Local delivery usually takes 2-4 business days. International delivery ranges from 7-14 business days.</p>
+    </article>
+    
+    <article class="faq-item">
+      <h3>Can I return a product?</h3>
+      <p>You can request a return within 14 days if the product is unused and in original condition.</p>
+    </article>
+    
+    <article class="faq-item">
+      <h3>How can I contact support?</h3>
+      <p>You can reach our support team at support@kiemtra01.local. We respond within 24 hours on business days.</p>
+    </article>
+    
+  </div>
+</section>
+
+<section id="section-newsletter" class="newsletter-block" data-reveal>
+  <div class="section-head center">
+    <span>Newsletter</span>
+    <h2>Get Weekly <em>Tech Picks</em></h2>
+    <p>Receive curated recommendations across the full product catalog.</p>
+  </div>
+  <form class="newsletter-form" onsubmit="return false;">
+    <label for="newsletter-email">Email Address</label>
+    <input id="newsletter-email" type="email" placeholder="you@example.com" required>
+    <button class="cta-dark" type="submit">Subscribe</button>
+  </form>
+</section>
+
+  </main>
+
+  
+  <div class="assist-shell" data-assist-shell>
+  <button type="button" class="assist-fab" data-assist-toggle aria-label="Open assistant" aria-expanded="true" aria-controls="floating-assist-panel">
+    <span>Chat</span>
+  </button>
+
+  <section
+    id="floating-assist-panel"
+    class="assist-panel is-open"
+    data-assist-panel
+    data-assist-panel-root
+    data-chat-endpoint="/customer/chatbot/reply/"
+    data-assist-storage-key="assist-history:user-10"
+    
+  >
+    <header class="assist-head">
+      <div>
+        <p class="assist-head-kicker">AI Assistant</p>
+        <h3>Store Assistant</h3>
+        <p>Ask about products and availability.</p>
+      </div>
+      <div class="assist-head-actions">
+        <button type="button" class="assist-clear" data-assist-clear aria-label="Clear chat history">Clear</button>
+        <button type="button" class="assist-close" data-assist-close aria-label="Close assistant">x</button>
+      </div>
+    </header>
+
+    <div class="assist-log" data-assist-log>
+      <article class="assist-msg assist-msg-assistant">
+        <p>
+          
+          Ask about products on this website, budget options, or in-stock recommendations.
+          
+        </p>
+      </article>
+    <article class="assist-msg assist-msg-user"><p>Suggest a practical setup for travel and daily work.</p></article><article class="assist-msg assist-msg-assistant"><p>LLM API key is missing, so fallback mode is being used.
+
+Recommended options:
+- Commute Pack 16 (Bags & Stands, Peak Design, $189.00, stock 17)
+- Desk Arm Vision (Bags & Stands, BenQ, $129.00, stock 14)
+- Travel Pouch Kit (Bags & Stands, Native Union, $49.00, stock 33)
+- Commute Pack 20 (Bags & Stands, Peak Design, $219.00, stock 11)
+- LiftStand Fold (Bags & Stands, Twelve South, $59.00, stock 31)</p></article><div class="assist-citation-wrap"><p class="assist-citation-title">Sources</p><ul class="assist-citation-list"><li><a href="/customer/products/business-laptops/3/">Product catalog: [business-laptops] Transit Office 14</a></li><li><a href="/customer/products/bags-stands/100/">Product catalog: [bags-stands] Travel Pouch Kit</a></li><li><a href="/customer/products/business-laptops/10/">Product catalog: [business-laptops] OfficeCore Flex 15</a></li></ul></div><div class="assist-recommend-grid"><a class="assist-recommend-card" href="/customer/products/bags-stands/91/"><strong>Commute Pack 16</strong><span>Bags & Stands | Peak Design</span><span>$189.00 | Stock: 17</span></a><a class="assist-recommend-card" href="/customer/products/bags-stands/99/"><strong>Desk Arm Vision</strong><span>Bags & Stands | BenQ</span><span>$129.00 | Stock: 14</span></a><a class="assist-recommend-card" href="/customer/products/bags-stands/100/"><strong>Travel Pouch Kit</strong><span>Bags & Stands | Native Union</span><span>$49.00 | Stock: 33</span></a><a class="assist-recommend-card" href="/customer/products/bags-stands/92/"><strong>Commute Pack 20</strong><span>Bags & Stands | Peak Design</span><span>$219.00 | Stock: 11</span></a></div></div>
+
+    <div class="assist-quick-row" data-assist-quick-row>
+      <button type="button" class="assist-quick-btn" data-assist-quick="Show me in-stock options under $1000.">Under $1000</button>
+      <button type="button" class="assist-quick-btn" data-assist-quick="What products are available on this store right now?">In Stock</button>
+      <button type="button" class="assist-quick-btn" data-assist-quick="/model gemma">Use Gemma</button>
+      <button type="button" class="assist-quick-btn" data-assist-quick="/model gemini">Use Gemini</button>
+      
+      <button type="button" class="assist-quick-btn" data-assist-quick="Recommend a practical work setup across different categories.">Work Setup</button>
+      
+    </div>
+
+    <div class="assist-quick-row">
+      <button type="button" class="assist-quick-btn" data-assist-quick="/model">Current Model</button>
+    </div>
+
+    <form class="assist-form" data-assist-form>
+      <input
+        type="text"
+        name="message"
+        data-assist-input
+        maxlength="500"
+        placeholder="Ask your question..."
+        autocomplete="off"
+        required
+      >
+      <button class="cta-dark" type="submit" data-assist-send>Send</button>
+    </form>
+  </section>
+</div>
+
+  
+
+  <footer class="site-footer">
+    <div class="shell footer-grid">
+      <div>
+        <p class="footer-logo">UN Uncover</p>
+        <p class="footer-muted">Exploring tech and design shaping daily life.</p>
+      </div>
+      <div>
+        <p class="footer-title">Pages</p>
+        <a href="/customer/dashboard/">Home</a>
+        <a href="/customer/cart/">Cart</a>
+        <a href="/customer/saved/">Saved</a>
+        <a href="/customer/orders/">Orders</a>
+        <a href="/customer/compare/">Compare</a>
+      </div>
+      <div>
+        <p class="footer-title">Categories</p>
+        <a href="/customer/dashboard/?category=all">All Categories</a>
+        
+        <a href="/customer/dashboard/?category=business-laptops">Business Laptops</a>
+        
+        <a href="/customer/dashboard/?category=gaming-laptops">Gaming Laptops</a>
+        
+        <a href="/customer/dashboard/?category=ultrabooks">Ultrabooks</a>
+        
+        <a href="/customer/dashboard/?category=smartphones">Smartphones</a>
+        
+        <a href="/customer/dashboard/?category=tablets">Tablets</a>
+        
+        <a href="/customer/dashboard/?stock=in_stock">In Stock</a>
+      </div>
+      <div>
+        <p class="footer-title">Need Help</p>
+        <p class="footer-muted">Support: support@kiemtra01.local</p>
+      </div>
+    </div>
+    <div class="shell footer-copy">© 2026 Kiemtra01. All rights reserved.</div>
+  </footer>
+  <script src="/static/js/site.js"></script>
+</body>
+</html>

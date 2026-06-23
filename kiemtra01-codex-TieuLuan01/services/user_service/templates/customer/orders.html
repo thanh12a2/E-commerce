@@ -1,0 +1,99 @@
+{% extends 'customer/base.html' %}
+{% block title %}Order History - Nike Lab{% endblock %}
+{% block content %}
+
+<div class="section-head">
+  <span class="section-tag">Orders</span>
+  <h1>Order <em>History</em></h1>
+  <p>Track payment and shipping status for all your orders.</p>
+</div>
+
+{% if orders %}
+<div style="display:grid;gap:16px;margin-top:20px;" id="orders-list">
+  {% for order in orders %}
+  <div class="order-card" id="order-card-{{ order.id }}">
+    <div class="order-card-header">
+      <div>
+        <div class="order-id">#{{ order.id }}</div>
+        <div class="order-date">{{ order.created_at }}</div>
+      </div>
+      <div class="order-status-pair">
+        <span class="order-status-unit">
+          <span class="order-status-label">Payment</span>
+          <span class="badge-status {% if order.payment_status == 'paid' %}badge-paid{% elif order.payment_status == 'pending' %}badge-pending{% else %}badge-cancelled{% endif %}">
+            {% if order.payment_status == 'paid' %}Complete{% else %}{{ order.payment_status|title }}{% endif %}
+          </span>
+        </span>
+        <span class="order-status-unit">
+          <span class="order-status-label">Shipping</span>
+          <span class="badge-status {% if order.shipping_status == 'delivered' %}badge-delivered{% elif order.shipping_status == 'shipped' %}badge-shipped{% elif order.shipping_status == 'preparing' %}badge-preparing{% else %}badge-pending{% endif %}">
+            {{ order.shipping_status|title }}
+          </span>
+        </span>
+      </div>
+      <div class="order-total">${{ order.total_amount }}</div>
+    </div>
+
+    {% if order.shipping %}
+    <div style="padding:10px 20px;background:var(--surface-2);border-bottom:1px solid rgba(255,255,255,0.05);font-size:12px;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap;">
+      <span>{{ order.shipping.recipient_name }}, {{ order.shipping.phone }}</span>
+      <span>{{ order.shipping.address_line }}, {{ order.shipping.city_or_region }}, {{ order.shipping.postal_code }}, {{ order.shipping.country }}</span>
+      {% if order.shipping.note %}<span>Note: {{ order.shipping.note }}</span>{% endif %}
+    </div>
+    {% endif %}
+
+    {% if order.payment_status == 'pending' %}
+    <div style="padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.05);">
+      <form method="post" action="/customer/orders/{{ order.id }}/pay/" id="pay-form-{{ order.id }}">
+        {% csrf_token %}
+        <button type="submit" class="cta-green" id="pay-btn-{{ order.id }}" style="width:auto;">Pay Now</button>
+      </form>
+    </div>
+    {% endif %}
+
+    <div class="order-items-wrap">
+      <div class="data-table-wrap" style="padding:0 20px 12px;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Category</th>
+              <th>Brand</th>
+              <th>Qty</th>
+              <th style="text-align:right;">Unit Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in order.items %}
+            <tr>
+              <td>{{ item.product_name }}</td>
+              <td>
+                {% if item.category_name %}
+                  {{ item.category_name }}
+                {% elif item.category_slug %}
+                  {{ item.category_slug|title }}
+                {% elif item.product_service %}
+                  {{ item.product_service|title }}
+                {% else %}
+                  N/A
+                {% endif %}
+              </td>
+              <td>{{ item.product_brand|default:'N/A' }}</td>
+              <td>x {{ item.quantity }}</td>
+              <td style="text-align:right;color:var(--accent);font-weight:700;">${{ item.unit_price }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state" style="margin-top:20px;text-align:center;">
+  <p style="font-size:32px;margin-bottom:12px;">No orders placed yet.</p>
+  <a class="cta-green btn-lg" style="margin-top:16px;display:inline-flex;" href="/customer/cart/" id="orders-go-cart-btn">Go to Cart</a>
+</div>
+{% endif %}
+{% endblock %}

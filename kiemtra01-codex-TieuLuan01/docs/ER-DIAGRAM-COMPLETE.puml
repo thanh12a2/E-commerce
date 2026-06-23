@@ -1,0 +1,381 @@
+@startuml ecommerce_complete_schema
+
+' ============================================
+' E-COMMERCE MICROSERVICES - COMPLETE ER DIAGRAM
+' ============================================
+
+!define TABLE(x) entity x << (T, #FFAAAA) >>
+!define PK : Integer <<PK>>
+!define FK : Integer <<FK>>
+
+' ============================================
+' MYSQL - USER SERVICE (user_db)
+' ============================================
+
+package "🟨 MYSQL: user_db (user_service)" #FFE6E6 {
+
+  TABLE(User) {
+    * id : Integer <<PK>>
+    --
+    * username : String[255]
+    * email : String[255]
+    * password_hash : String[255]
+    is_staff : Boolean (default=False)
+    is_active : Boolean (default=True)
+    created_at : Timestamp
+    updated_at : Timestamp
+  }
+
+  TABLE(BlogPost) {
+    * id : Integer <<PK>>
+    --
+    * title : String[255]
+    * slug : String[255] <<UNIQUE>>
+    author : String[120]
+    category : String[80]
+    excerpt : Text
+    body : Text
+    hero_image_url : URL
+    published_at : Date
+    created_at : Timestamp
+  }
+
+  TABLE(Testimonial) {
+    * id : Integer <<PK>>
+    --
+    * name : String[120]
+    * role : String[120]
+    quote : Text
+    rating : Integer (1-5, default=5)
+    avatar_url : URL
+    is_featured : Boolean (default=True)
+    created_at : Timestamp
+  }
+
+  TABLE(LegacyUserMapping) {
+    * id : Integer <<PK>>
+    --
+    user_id : Integer <<FK>>
+    legacy_source : String[20] <<UNIQUE>>
+    legacy_user_id : Integer <<UNIQUE>>
+    legacy_username : String[150]
+    legacy_email : String[255]
+    note : Text
+    created_at : Timestamp
+  }
+}
+
+' ============================================
+' MYSQL - ORDER SERVICE (order_db)
+' ============================================
+
+package "🟨 MYSQL: order_db (order_service)" #FFE6E6 {
+
+  TABLE(Cart) {
+    * id : Integer <<PK>>
+    --
+    * user_id : Integer <<FK>>
+    created_at : Timestamp
+    updated_at : Timestamp
+  }
+
+  TABLE(CartItem) {
+    * id : Integer <<PK>>
+    --
+    * cart_id : Integer <<FK>>
+    * product_id : Integer
+    product_name : String[255] [snapshot]
+    unit_price : Decimal(12,2)
+    quantity : Integer
+    category_slug : String[120]
+    created_at : Timestamp
+  }
+
+  TABLE(SavedItem) {
+    * id : Integer <<PK>>
+    --
+    * cart_id : Integer <<FK>>
+    * product_id : Integer
+    product_name : String[255] [snapshot]
+    unit_price : Decimal(12,2)
+    category_slug : String[120]
+    created_at : Timestamp
+  }
+
+  TABLE(CompareItem) {
+    * id : Integer <<PK>>
+    --
+    * user_id : Integer <<FK>>
+    * product_id : Integer
+    product_name : String[255] [snapshot]
+    created_at : Timestamp
+  }
+
+  TABLE(Order) {
+    * id : Integer <<PK>>
+    --
+    * user_id : Integer <<FK>>
+    * status : String[50]
+    subtotal : Decimal(12,2)
+    tax : Decimal(12,2)
+    shipping_cost : Decimal(12,2)
+    total_amount : Decimal(12,2)
+    payment_status : String[50]
+    shipping_status : String[50]
+    created_at : Timestamp
+    updated_at : Timestamp
+  }
+
+  TABLE(OrderItem) {
+    * id : Integer <<PK>>
+    --
+    * order_id : Integer <<FK>>
+    * product_id : Integer
+    product_name : String[255] [snapshot]
+    product_brand : String[120] [snapshot]
+    product_image_url : URL [snapshot]
+    unit_price : Decimal(12,2) [snapshot]
+    quantity : Integer
+    total_price : Decimal(12,2)
+    category_slug : String[120]
+    created_at : Timestamp
+  }
+
+  TABLE(OrderPaymentSnapshot) {
+    * id : Integer <<PK>>
+    --
+    * order_id : Integer <<FK>>
+    payment_id : Integer
+    amount : Decimal(12,2)
+    method : String[50]
+    status : String[50]
+    transaction_id : String[255]
+    paid_at : Timestamp
+  }
+
+  TABLE(OrderShippingSnapshot) {
+    * id : Integer <<PK>>
+    --
+    * order_id : Integer <<FK>>
+    shipment_id : Integer
+    recipient_name : String[255]
+    address : Text
+    city : String[100]
+    postal_code : String[20]
+    tracking_number : String[255]
+    status : String[50]
+    updated_at : Timestamp
+  }
+}
+
+' ============================================
+' POSTGRESQL - PRODUCT SERVICE (product_db)
+' ============================================
+
+package "🟦 PostgreSQL: product_db (product_service)" #E6F2FF {
+
+  TABLE(Category) {
+    * id : Serial <<PK>>
+    --
+    * name : Varchar[255]
+    * slug : Varchar[255] <<UNIQUE>>
+    description : Text
+  }
+
+  TABLE(Shop) {
+    * id : Serial <<PK>>
+    --
+    * name : Varchar[255]
+    description : Text
+    phone : Varchar[20]
+    email : Varchar[255]
+  }
+
+  TABLE(Product) {
+    * id : Serial <<PK>>
+    --
+    * name : Varchar[255]
+    * slug : Varchar[255] <<UNIQUE>>
+    description : Text
+    * price : Decimal(10,2)
+    * stock : Integer
+    image_url : Varchar[500]
+    * category_id : Integer <<FK>>
+    * shop_id : Integer <<FK>>
+    brand : Varchar[120]
+    catalog_source : Varchar[50]
+    created_at : Timestamp
+    updated_at : Timestamp
+  }
+}
+
+' ============================================
+' POSTGRESQL - PAYMENT SERVICE (payment_db)
+' ============================================
+
+package "🟦 PostgreSQL: payment_db (payment_service)" #E6F2FF {
+
+  TABLE(Payment) {
+    * id : Serial <<PK>>
+    --
+    * order_id : Integer
+    * amount : Decimal(12,2)
+    * method : Varchar[50]
+    * status : Varchar[50]
+    transaction_id : Varchar[255]
+    currency : Varchar[3] (default='USD')
+    metadata : JSONB
+    paid_at : Timestamp NULL
+    refunded_at : Timestamp NULL
+    created_at : Timestamp
+    updated_at : Timestamp
+  }
+
+  TABLE(PaymentEvent) {
+    * id : Serial <<PK>>
+    --
+    * payment_id : Integer <<FK>>
+    * event_type : Varchar[100]
+    reason : Text
+    timestamp : Timestamp
+  }
+}
+
+' ============================================
+' POSTGRESQL - SHIPPING SERVICE (shipping_db)
+' ============================================
+
+package "🟦 PostgreSQL: shipping_db (shipping_service)" #E6F2FF {
+
+  TABLE(Shipment) {
+    * id : Serial <<PK>>
+    --
+    * order_id : Integer
+    * status : Varchar[50]
+    * recipient_name : Varchar[255]
+    phone : Varchar[20]
+    address : Text
+    city : Varchar[100]
+    postal_code : Varchar[20]
+    country : Varchar[100]
+    tracking_number : Varchar[255] <<UNIQUE>>
+    carrier : Varchar[100]
+    estimated_delivery : Date
+    created_at : Timestamp
+    updated_at : Timestamp
+  }
+
+  TABLE(ShipmentTracking) {
+    * id : Serial <<PK>>
+    --
+    * shipment_id : Integer <<FK>>
+    * status : Varchar[50]
+    * location : Varchar[255]
+    * timestamp : Timestamp
+  }
+}
+
+' ============================================
+' POSTGRESQL - CHATBOT SERVICE (chatbot_db)
+' ============================================
+
+package "🟦 PostgreSQL: chatbot_db (chatbot_service)" #E6F2FF {
+
+  TABLE(BehaviorEvent) {
+    * id : Serial <<PK>>
+    --
+    * user_id : Integer
+    product_id : Integer NULL
+    order_id : Integer NULL
+    * event_type : Varchar[100]
+    * event_data : JSONB
+    session_id : Varchar[255]
+    device_type : Varchar[50]
+    * timestamp : Timestamp
+    created_at : Timestamp
+  }
+
+  note right of BehaviorEvent
+    event_type: search, view_product,
+    chatbot_ask, save_item, compare_item,
+    add_to_cart, checkout, pay_order
+  end note
+}
+
+' ============================================
+' NEO4J - OPTIONAL (Behavior Graph)
+' ============================================
+
+package "🟩 Neo4j: Behavior Knowledge Graph (optional)" #E6FFE6 {
+
+  note as N1
+    Nodes:
+    - User (user_ref, event_count, affinity_total)
+    - Behavior (behavior_id, event_ts, behavior_type)
+    - Category (slug, name)
+    - Product (product_id, name, price, stock)
+
+    Relationships:
+    - (User)-[:PERFORMED]->(Behavior)
+    - (Behavior)-[:IN_CATEGORY]->(Category)
+    - (Behavior)-[:ON_PRODUCT]->(Product)
+    - (Product)-[:BELONGS_TO]->(Category)
+    - (User)-[:PREFERS {score, affinity}]->(Category)
+  end note
+}
+
+' ============================================
+' RELATIONSHIPS
+' ============================================
+
+' User → Cart
+User "1" --> "1" Cart : has
+' User → Order
+User "1" --> "N" Order : places
+' User → CompareItem
+User "1" --> "N" CompareItem : compares
+' User → BehaviorEvent
+User "1" --> "N" BehaviorEvent : generates
+' User → LegacyUserMapping
+User "1" --> "N" LegacyUserMapping : mapped_by
+
+' Cart → CartItem
+Cart "1" --> "N" CartItem : contains
+' Cart → SavedItem
+Cart "1" --> "N" SavedItem : saves
+
+' Order → OrderItem
+Order "1" --> "N" OrderItem : has_items
+' Order → OrderPaymentSnapshot
+Order "1" --> "0..1" OrderPaymentSnapshot : snapshots_payment
+' Order → OrderShippingSnapshot
+Order "1" --> "0..1" OrderShippingSnapshot : snapshots_shipping
+
+' Category → Product
+Category "1" --> "N" Product : contains
+
+' Shop → Product
+Shop "1" --> "N" Product : sells
+
+' Payment → PaymentEvent
+Payment "1" --> "N" PaymentEvent : has_events
+
+' Shipment → ShipmentTracking
+Shipment "1" --> "N" ShipmentTracking : tracks
+
+' Product References (Cross-service)
+note as RelationNote
+  Cross-Service Relationships:
+  - Order.user_id → User.id (MYSQL)
+  - CartItem.product_id → Product.id (PG)
+  - Product.category_id → Category.id (PG)
+  - OrderPaymentSnapshot.order_id → Order.id (MYSQL)
+  - OrderShippingSnapshot.order_id → Order.id (MYSQL)
+  - BehaviorEvent.user_id → User.id (MYSQL)
+  - BehaviorEvent.product_id → Product.id (PG, optional)
+  - BehaviorEvent.order_id → Order.id (MYSQL, optional)
+  - Payment.order_id → Order.id (MYSQL, event-driven)
+  - Shipment.order_id → Order.id (MYSQL, event-driven)
+end note
+
+@enduml

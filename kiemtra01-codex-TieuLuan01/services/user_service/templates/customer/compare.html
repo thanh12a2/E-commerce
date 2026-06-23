@@ -1,0 +1,78 @@
+{% extends 'customer/base.html' %}
+{% block title %}Compare Products — Nike Lab{% endblock %}
+{% block content %}
+
+<div class="section-head" style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;">
+  <div>
+    <span class="section-tag">Compare</span>
+    <h1>Product <em>Comparison</em></h1>
+    <p>Side-by-side view. Max 4 items. Move the winner to cart.</p>
+  </div>
+  <div style="display:flex;gap:8px;">
+    <a class="cta-light btn-sm" href="/customer/dashboard/#section-products" id="compare-back-btn">← Back to Products</a>
+    <a class="cta-green btn-sm" href="/customer/cart/" id="compare-go-cart-btn">Go to Cart →</a>
+  </div>
+</div>
+
+{% if compare_items %}
+<div class="product-grid" style="margin-top:20px;">
+  {% for item in compare_items %}
+  <article class="store-card" id="compare-card-{{ item.id }}">
+    <a class="product-image mini-image" href="/customer/products/{{ item.category_slug|default:item.product_service }}/{{ item.product_id }}/" id="compare-img-{{ item.id }}">
+      <span class="product-service">{{ item.category_name|default:item.category_slug|default:item.product_service|title }}</span>
+      <img loading="lazy" src="{{ item.product_image_url|default:'https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&w=800&q=80' }}" data-fallback-src="https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&w=800&q=80" onerror="this.onerror=null;this.src=this.dataset.fallbackSrc;" alt="{{ item.product_name }}">
+    </a>
+    <div class="product-meta">
+      <h3>{{ item.product_name }}</h3>
+      <p>{{ item.product_brand|default:'N/A' }}</p>
+    </div>
+    <!-- Spec list -->
+    <div style="background:var(--surface-2);border:1px solid rgba(255,255,255,0.05);border-radius:var(--r-sm);padding:10px;display:grid;gap:8px;font-size:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="color:var(--muted);">Price</span>
+        <strong style="color:var(--accent);font-size:16px;">${{ item.unit_price }}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="color:var(--muted);">Category</span>
+        <span>{{ item.category_name|default:item.category_slug|default:item.product_service|title }}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="color:var(--muted);">Stock</span>
+        <span class="{% if item.stock == 0 %}stock-out{% elif item.stock <= 5 %}stock-low{% else %}stock-ok{% endif %}">{{ item.stock }}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="color:var(--muted);">Added</span>
+        <span>{{ item.created_at|slice:':10' }}</span>
+      </div>
+    </div>
+    <form method="post" action="/customer/cart/add/" class="add-form" id="compare-cart-form-{{ item.id }}">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="/customer/compare/">
+      <input type="hidden" name="category_slug" value="{{ item.category_slug|default:item.product_service }}">
+      <input type="hidden" name="category_name" value="{{ item.category_name }}">
+      <input type="hidden" name="product_id" value="{{ item.product_id }}">
+      <input type="hidden" name="product_name" value="{{ item.product_name }}">
+      <input type="hidden" name="product_brand" value="{{ item.product_brand }}">
+      <input type="hidden" name="product_image_url" value="{{ item.product_image_url }}">
+      <input type="hidden" name="unit_price" value="{{ item.unit_price }}">
+      <input type="hidden" name="stock" value="{{ item.stock }}">
+      <button class="cta-green" type="submit" id="compare-add-cart-{{ item.id }}" {% if item.stock == 0 %}disabled style="opacity:.4;"{% endif %}>🛒 Add to Cart</button>
+    </form>
+    <div class="card-actions-row">
+      <a class="cta-outline" href="/customer/products/{{ item.category_slug|default:item.product_service }}/{{ item.product_id }}/" id="compare-view-{{ item.id }}">View</a>
+      <form method="post" action="/customer/compare/remove/{{ item.id }}/" id="compare-remove-form-{{ item.id }}">
+        {% csrf_token %}
+        <button class="danger-btn" type="submit" id="compare-remove-{{ item.id }}">Remove</button>
+      </form>
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state" style="margin-top:20px;text-align:center;">
+  <p style="font-size:32px;margin-bottom:12px;">⚖</p>
+  <p>Nothing to compare yet.</p>
+  <a class="cta-green btn-lg" style="margin-top:16px;display:inline-flex;" href="/customer/dashboard/#section-products" id="compare-go-shop-btn">Add Products to Compare</a>
+</div>
+{% endif %}
+{% endblock %}

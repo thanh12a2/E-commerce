@@ -1,0 +1,40 @@
+{% extends 'customer/base.html' %}
+{% block title %}Create Account — Nike Lab{% endblock %}
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo">Nike <span style="color:var(--muted);font-weight:400;font-size:16px;">Lab</span></div>
+    <h1>Create account</h1>
+    <p class="subtitle">Join Nike Lab to browse, save, and order tech devices.</p>
+
+    {% if form.non_field_errors %}
+    <div class="auth-error">{{ form.non_field_errors.0 }}</div>
+    {% endif %}
+    {% include 'partials/messages.html' %}
+
+    <form class="auth-form" method="post" action="/customer/register/" id="register-form">
+      {% csrf_token %}
+      <div class="auth-field">
+        <label for="id_username">Username</label>
+        {{ form.username }}
+        {% if form.username.errors %}<span style="color:var(--error);font-size:12px;">{{ form.username.errors.0 }}</span>{% endif %}
+      </div>
+      <div class="auth-field">
+        <label for="id_email">Email address</label>
+        {{ form.email }}
+        {% if form.email.errors %}<span style="color:var(--error);font-size:12px;">{{ form.email.errors.0 }}</span>{% endif %}
+      </div>
+      <div class="auth-field">
+        <label for="id_password">Password</label>
+        {{ form.password }}
+      </div>
+      <div class="auth-field">
+        <label for="id_confirm_password">Confirm password</label>
+        {{ form.confirm_password }}
+      </div>
+      <button type="submit" class="cta-green auth-submit" id="register-submit-btn">Create Account</button>
+    </form>
+    <p class="auth-switch">Already have an account? <a href="/customer/login/">Sign in</a></p>
+  </div>
+</div>
+{% endblock %}

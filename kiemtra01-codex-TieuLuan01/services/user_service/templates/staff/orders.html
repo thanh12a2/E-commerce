@@ -1,0 +1,93 @@
+{% extends 'staff/base.html' %}
+{% block title %}Staff Orders{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <h1>Order Management</h1>
+    <p class="subtitle">Review payment and shipping status, and advance shipping progression.</p>
+  </div>
+</div>
+
+<!-- Quick status filters -->
+<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
+  <span style="font-size:11px;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.5px;">Filter:</span>
+  <a class="service-filter-chip {% if not selected_shipping_status and not selected_payment_status %}active{% endif %}" href="/staff/orders/" id="orders-all-btn">All</a>
+  <a class="service-filter-chip {% if selected_payment_status == 'pending' %}active{% endif %}" href="/staff/orders/?payment_status=pending" id="orders-pending-btn">Payment Pending</a>
+  <a class="service-filter-chip {% if selected_payment_status == 'paid' %}active{% endif %}" href="/staff/orders/?payment_status=paid" id="orders-paid-btn">Paid</a>
+  <a class="service-filter-chip {% if selected_shipping_status == 'pending' %}active{% endif %}" href="/staff/orders/?shipping_status=pending" id="orders-ship-pending-btn">Ship Pending</a>
+  <a class="service-filter-chip {% if selected_shipping_status == 'shipped' %}active{% endif %}" href="/staff/orders/?shipping_status=shipped" id="orders-shipped-btn">Shipped</a>
+  <a class="service-filter-chip {% if selected_shipping_status == 'delivered' %}active{% endif %}" href="/staff/orders/?shipping_status=delivered" id="orders-delivered-btn">Delivered</a>
+</div>
+
+{% if orders %}
+<div class="panel" style="padding:0;overflow:hidden;">
+  <div class="table-scroll-wrap">
+    <table class="staff-items-table">
+      <thead>
+        <tr>
+          <th>Order</th>
+          <th>Customer</th>
+          <th>Payment</th>
+          <th>Shipping</th>
+          <th>Total</th>
+          <th>Ship To</th>
+          <th>Items</th>
+          <th>Update Shipping</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+        <tr>
+          <td>
+            <strong>#{{ order.id }}</strong><br>
+            <small style="color:var(--dim);font-size:11px;">{{ order.created_at }}</small>
+          </td>
+          <td style="font-size:12px;">{{ order.user_id }}</td>
+          <td>
+            <span class="badge-status {% if order.payment_status == 'paid' %}badge-paid{% elif order.payment_status == 'pending' %}badge-pending{% else %}badge-cancelled{% endif %}">
+              {{ order.payment_status|upper }}
+            </span>
+          </td>
+          <td>
+            <span class="badge-status {% if order.shipping_status == 'delivered' %}badge-delivered{% elif order.shipping_status == 'shipped' %}badge-shipped{% elif order.shipping_status == 'preparing' %}badge-preparing{% else %}badge-pending{% endif %}">
+              {{ order.shipping_status|upper }}
+            </span>
+          </td>
+          <td style="color:var(--accent);font-weight:700;">${{ order.total_amount }}</td>
+          <td style="font-size:11px;color:var(--muted);max-width:140px;">
+            {% if order.shipping %}
+            {{ order.shipping.recipient_name }}<br>
+            {{ order.shipping.phone }}<br>
+            {{ order.shipping.city_or_region }}, {{ order.shipping.country }}
+            {% else %}N/A{% endif %}
+          </td>
+          <td style="font-size:11px;max-width:160px;">
+            {% for item in order.items %}
+            <div style="color:var(--muted);">{{ item.product_name }} ×{{ item.quantity }}</div>
+            {% endfor %}
+          </td>
+          <td>
+            <form method="post" class="shipping-select-form" id="ship-form-{{ order.id }}">
+              {% csrf_token %}
+              <input type="hidden" name="order_id" value="{{ order.id }}">
+              <select name="shipping_status" id="ship-select-{{ order.id }}">
+                {% for value, label in shipping_status_choices %}
+                <option value="{{ value }}" {% if order.shipping_status == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+              <button type="submit" class="table-btn primary" id="ship-update-{{ order.id }}">Update</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="panel">
+  <p style="color:var(--dim);">No orders found{% if selected_shipping_status or selected_payment_status %} for the selected filter{% endif %}.</p>
+</div>
+{% endif %}
+{% endblock %}

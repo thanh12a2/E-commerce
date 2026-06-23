@@ -1,0 +1,103 @@
+{% extends 'staff/base.html' %}
+{% block title %}Customer: {{ customer.username }}{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <a style="font-size:12px;color:var(--muted);display:inline-flex;align-items:center;gap:4px;margin-bottom:8px;" href="/staff/customers/">← Back to Customers</a>
+    <h1>Customer Profile</h1>
+    <p class="subtitle">Account details and purchase history for {{ customer.username }}.</p>
+  </div>
+</div>
+
+<!-- Profile header -->
+<div class="panel" style="margin-bottom:16px;">
+  <div class="customer-detail-header">
+    <div class="customer-avatar-lg">{{ customer.username|slice:":1"|upper }}</div>
+    <div class="customer-meta">
+      <h1 style="font-size:22px;font-weight:700;margin:0;">
+        {{ customer.first_name }} {{ customer.last_name }}
+        {% if not customer.first_name and not customer.last_name %}{{ customer.username }}{% endif %}
+      </h1>
+      <p>@{{ customer.username }} · {{ customer.email|default:'No email' }}</p>
+    </div>
+    <div style="margin-left:auto;">
+      <span class="badge-status {% if customer.is_active %}badge-active{% else %}badge-inactive{% endif %}">
+        {% if customer.is_active %}● Active{% else %}● Inactive{% endif %}
+      </span>
+    </div>
+  </div>
+
+  <!-- Info grid -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
+    <div class="stats-card"><p class="stats-label">User ID</p><p class="stats-value" style="font-size:18px;">#{{ customer.id }}</p></div>
+    <div class="stats-card"><p class="stats-label">Date Joined</p><p class="stats-value" style="font-size:16px;">{{ customer.date_joined|date:"d M Y" }}</p></div>
+    <div class="stats-card"><p class="stats-label">Staff Access</p><p class="stats-value" style="font-size:16px;">{% if customer.is_staff %}Yes{% else %}No{% endif %}</p></div>
+    <div class="stats-card"><p class="stats-label">Orders (90d)</p><p class="stats-value" style="font-size:18px;">{{ customer_row.order_count|default:'0' }}</p></div>
+    <div class="stats-card"><p class="stats-label">Total Spent</p><p class="stats-value green" style="font-size:18px;">${{ customer_row.total_spent|default:'0' }}</p></div>
+  </div>
+
+  <!-- Action bar -->
+  <div class="detail-actions-bar">
+    <a class="table-btn primary" href="/staff/customers/{{ customer.id }}/edit/" id="customer-edit-btn">✏ Edit Account</a>
+    <form method="post" action="/staff/customers/{{ customer.id }}/toggle-active/" style="margin:0;" id="toggle-active-form">
+      {% csrf_token %}
+      <button type="submit" class="table-btn {% if customer.is_active %}warning{% else %}primary{% endif %}" id="toggle-active-btn"
+        onclick="return confirm('{% if customer.is_active %}Deactivate{% else %}Activate{% endif %} this account?')">
+        {% if customer.is_active %}⊗ Deactivate{% else %}⊕ Activate{% endif %}
+      </button>
+    </form>
+    <form method="post" action="/staff/customers/{{ customer.id }}/reset-password/" style="margin:0;" id="reset-password-form">
+      {% csrf_token %}
+      <button type="submit" class="table-btn danger" id="reset-password-btn"
+        onclick="return confirm('Reset password for {{ customer.username }}? A temporary password will be shown once.')">
+        🔑 Reset Password
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Orders table -->
+<div class="panel">
+  <h2>Order History</h2>
+  <p class="panel-subtitle">All orders placed by this customer (last 90 days).</p>
+  {% if customer_orders %}
+  <div class="table-scroll-wrap">
+    <table class="staff-items-table compact-table">
+      <thead>
+        <tr>
+          <th>Order</th>
+          <th>Date</th>
+          <th>Payment</th>
+          <th>Shipping</th>
+          <th>Total</th>
+          <th>Units</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in customer_orders %}
+        <tr>
+          <td>#{{ order.order_id }}</td>
+          <td style="color:var(--dim);font-size:11px;">{{ order.created_at }}</td>
+          <td>
+            <span class="badge-status {% if order.payment_status == 'paid' %}badge-paid{% elif order.payment_status == 'pending' %}badge-pending{% else %}badge-cancelled{% endif %}">
+              {{ order.payment_status }}
+            </span>
+          </td>
+          <td>
+            <span class="badge-status {% if order.shipping_status == 'delivered' %}badge-delivered{% elif order.shipping_status == 'shipped' %}badge-shipped{% else %}badge-pending{% endif %}">
+              {{ order.shipping_status }}
+            </span>
+          </td>
+          <td style="color:var(--accent);font-weight:700;">${{ order.total_amount }}</td>
+          <td>{{ order.total_units }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p style="color:var(--dim);font-size:13px;">No orders in the last 90 days.</p>
+  {% endif %}
+</div>
+{% endblock %}

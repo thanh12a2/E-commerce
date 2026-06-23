@@ -1,0 +1,395 @@
+@startuml ECommerce-Design-Package-Class-Diagram
+allowmixing
+
+' ============================================================
+' STYLE - Visual Paradigm-like design package/class diagram
+' ============================================================
+skinparam backgroundColor white
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
+skinparam classBackgroundColor #AEE2F0
+skinparam classBorderColor #2C7DA0
+skinparam classHeaderBackgroundColor #5BA3C2
+skinparam classHeaderFontColor #FFFFFF
+skinparam classFontColor #000000
+skinparam classFontSize 11
+skinparam classAttributeFontSize 10
+skinparam ArrowColor #2C7DA0
+skinparam ArrowFontSize 9
+skinparam ArrowFontColor #1A1A1A
+skinparam Padding 4
+hide circle
+hide empty members
+
+title Design Package/Class Diagram - Current E-Commerce Microservices System
+
+' ============================================================
+' GATEWAY
+' ============================================================
+package "gateway\nNginx reverse proxy" as GatewayPkg {
+  class NginxGateway {
+    +routeCustomer()
+    +routeStaff()
+    +routeProducts()
+    +routeCategories()
+    +routeCart()
+    +routeOrders()
+    +routePayments()
+    +routeShipments()
+    +routeChat()
+  }
+}
+
+' ============================================================
+' USER SERVICE
+' ============================================================
+package "user_service\nDjango session UI + JWT API" as UserPkg {
+  package "controller" as UserControllerPkg {
+    class "customer.views" as CustomerViews <<module facade>> {
+      +customer_dashboard_view()
+      +product_detail_view()
+      +cart_view()
+      +checkout_view()
+      +orders_view()
+      +chatbot_reply_view()
+      +staff_order_analytics_view()
+    }
+
+    class "staff.views" as StaffViews <<module facade>> {
+      +staff_dashboard_view()
+      +staff_items_view()
+      +staff_customers_view()
+      +staff_orders_view()
+    }
+
+    class "customer.api_auth" as AuthApiViews <<module facade>> {
+      +RegisterView.post()
+      +AuthTokenView.post()
+      +MeView.get()
+    }
+  }
+
+  package "service" as UserServicePkg {
+    class "customer.services" as CustomerServiceClient <<module facade>> {
+      +fetch_products()
+      +fetch_product_detail()
+      +add_to_cart()
+      +checkout_order()
+      +pay_order()
+      +update_shipping_status()
+      +request_chatbot_reply()
+      +export_behavior_source()
+    }
+
+    class "customer.api_gateway.registry" as GatewayRegistry <<module>> {
+      +build_gateway_registry()
+    }
+
+    class "customer.auth_rules" as AuthRules <<module>> {
+      +resolve_primary_role()
+      +can_access_customer()
+      +can_access_staff()
+    }
+  }
+
+  package "serializer/forms" as UserSerializerPkg {
+    class RegisterSerializer
+    class AuthTokenSerializer
+    class CustomerForms
+    class StaffForms
+  }
+
+  package "model" as UserModelPkg {
+    class AuthUser
+    class BlogPost
+    class Testimonial
+    class LegacyUserMapping
+  }
+}
+
+' ============================================================
+' PRODUCT SERVICE
+' ============================================================
+package "product_service\nCatalog API" as ProductPkg {
+  package "controller" as ProductControllerPkg {
+    class CategoryViewSet {
+      +list()
+      +retrieve()
+    }
+
+    class ProductViewSet {
+      +list()
+      +retrieve()
+      +create()
+      +update()
+      +destroy()
+      +get_queryset()
+    }
+  }
+
+  package "serializer" as ProductSerializerPkg {
+    class CategorySerializer
+    class ProductSerializer
+  }
+
+  package "model" as ProductModelPkg {
+    class Category
+    class Product
+  }
+
+  class StaffWritePermission
+}
+
+' ============================================================
+' ORDER SERVICE
+' ============================================================
+package "order_service\nCart + checkout orchestration" as OrderPkg {
+  package "controller" as OrderControllerPkg {
+    class "orders.views" as OrderViews <<module facade>> {
+      +cart_collection_view()
+      +saved_collection_view()
+      +compare_collection_view()
+      +checkout_view()
+      +orders_collection_view()
+      +pay_order_view()
+      +staff_shipping_update_view()
+      +behavior_source_view()
+    }
+  }
+
+  package "service client" as OrderServicePkg {
+    class "orders.service_clients" as OrderServiceClients <<module facade>> {
+      +create_pending_payment()
+      +confirm_order_payment()
+      +cancel_payment()
+      +create_pending_shipment()
+      +update_order_shipment_status()
+      +get_payment_by_order()
+      +get_shipment_by_order()
+    }
+
+    class DownstreamServiceError
+  }
+
+  package "model" as OrderModelPkg {
+    class CartItem
+    class SavedItem
+    class CompareItem
+    class Order
+    class OrderItem
+    class OrderShipping
+  }
+}
+
+' ============================================================
+' PAYMENT SERVICE
+' ============================================================
+package "payment_service\nPayment lifecycle API" as PaymentPkg {
+  package "controller" as PaymentControllerPkg {
+    class "payments.views" as PaymentViews <<view facade>> {
+      +PaymentCollectionView.post()
+      +PaymentDetailView.get()
+      +PaymentByOrderView.get()
+      +PaymentConfirmView.post()
+      +PaymentCancelView.post()
+    }
+  }
+
+  package "serializer" as PaymentSerializerPkg {
+    class PaymentSerializer
+  }
+
+  package "model" as PaymentModelPkg {
+    class Payment
+  }
+
+  class "InternalKeyPermission" as PaymentInternalKeyPermission <<payment_service>>
+}
+
+' ============================================================
+' SHIPPING SERVICE
+' ============================================================
+package "shipping_service\nShipment lifecycle API" as ShippingPkg {
+  package "controller" as ShippingControllerPkg {
+    class "shipments.views" as ShipmentViews <<view facade>> {
+      +ShipmentCollectionView.post()
+      +ShipmentDetailView.get()
+      +ShipmentByOrderView.get()
+      +ShipmentStatusView.patch()
+      +ShipmentStatusView.post()
+    }
+  }
+
+  package "serializer" as ShippingSerializerPkg {
+    class ShipmentSerializer
+  }
+
+  package "model" as ShippingModelPkg {
+    class Shipment
+  }
+
+  class "InternalKeyPermission" as ShipmentInternalKeyPermission <<shipping_service>>
+}
+
+' ============================================================
+' CHATBOT SERVICE
+' ============================================================
+package "chatbot_service\nAI consultation API" as ChatbotPkg {
+  package "controller" as ChatbotControllerPkg {
+    class "chatbot.views" as ChatbotViews <<module facade>> {
+      +chat_reply_view()
+      +ingest_behavior_event_view()
+    }
+  }
+
+  package "application service" as ChatbotServicePkg {
+    class "chatbot.services" as ChatbotService <<module facade>> {
+      +generate_chatbot_response()
+      +recommend_products()
+      -_call_llm()
+      -_fallback_answer()
+    }
+
+    class "chatbot.rag_kb" as RAGKnowledgeBase <<module>> {
+      +build_and_save_knowledge_base()
+      +load_knowledge_base()
+      +retrieve_rag_context()
+      +rag_citations_from_docs()
+    }
+
+    class "chatbot.behavior_ai" as BehaviorAI <<module>> {
+      +record_behavior_event()
+      +train_and_save_behavior_model()
+      +predict_behavior_for_user_ref()
+    }
+
+    class BehaviorGraphRetriever {
+      +is_available()
+      +fetch_context()
+    }
+  }
+
+  package "model/artifact" as ChatbotModelPkg {
+    class BehaviorEvent
+    class ModelArtifacts {
+      +knowledge_base.json
+      +model_behavior.json
+      +training_data_behavior.json
+      +model_best.keras
+      +label_encoder.json
+      +tokenizer_or_vocab.json
+      +data_user500.csv
+      +metrics_comparison.csv
+    }
+  }
+}
+
+database "MySQL\nuser_db" as UserDB
+database "MySQL\norder_db" as OrderDB
+database "PostgreSQL\nproduct_db" as ProductDB
+database "PostgreSQL\npayment_db" as PaymentDB
+database "PostgreSQL\nshipping_db" as ShippingDB
+database "PostgreSQL\nchatbot_db" as ChatbotDB
+database "Neo4j\nbehavior graph" as Neo4jDB
+
+' ============================================================
+' RELATIONSHIPS INSIDE SERVICES
+' "--"  : implementation association/collaboration, no diamond.
+' "*--" : Composition - composite, filled diamond at lifecycle owner.
+' "o--" : Aggregation - shared, hollow diamond at shared grouping side.
+' "..>" : dependency / runtime call / external resource.
+' ============================================================
+CustomerViews -- CustomerServiceClient : delegates
+StaffViews -- CustomerServiceClient : delegates
+AuthApiViews -- RegisterSerializer : validates
+AuthApiViews -- AuthTokenSerializer : issues JWT
+AuthApiViews -- AuthRules : role checks
+CustomerViews -- AuthRules : session access
+StaffViews -- AuthRules : staff access
+CustomerViews -- CustomerForms : form validation
+StaffViews -- StaffForms : form validation
+CustomerServiceClient -- GatewayRegistry : service map
+RegisterSerializer -- AuthUser : creates
+AuthTokenSerializer -- AuthUser : authenticates
+AuthUser *-- LegacyUserMapping : composite legacy mappings
+
+CategoryViewSet -- CategorySerializer : serializes
+ProductViewSet -- ProductSerializer : serializes
+ProductViewSet ..> StaffWritePermission : enforce write access
+CategorySerializer -- Category : model
+ProductSerializer -- Product : model
+Category o-- Product : shared catalog grouping
+
+OrderViews -- OrderServiceClients : orchestrates
+OrderViews -- CartItem : mutates
+OrderViews -- SavedItem : mutates
+OrderViews -- CompareItem : mutates
+OrderViews -- Order : creates / queries
+Order *-- OrderItem : composite cascade ownership
+Order *-- OrderShipping : composite cascade ownership
+OrderServiceClients ..> DownstreamServiceError : raise
+
+PaymentViews -- PaymentSerializer : validates
+PaymentViews -- PaymentInternalKeyPermission : internal key
+PaymentSerializer -- Payment : model
+
+ShipmentViews -- ShipmentSerializer : validates
+ShipmentViews -- ShipmentInternalKeyPermission : internal key
+ShipmentSerializer -- Shipment : model
+
+ChatbotViews -- ChatbotService : reply
+ChatbotViews -- BehaviorAI : ingest behavior
+ChatbotService -- RAGKnowledgeBase : retrieves context
+ChatbotService -- BehaviorAI : behavior signal
+ChatbotService -- BehaviorGraphRetriever : graph context
+BehaviorAI -- BehaviorEvent : persists event
+BehaviorAI -- ModelArtifacts : behavior/model artifacts
+BehaviorGraphRetriever ..> Neo4jDB : Cypher query
+RAGKnowledgeBase -- ModelArtifacts : knowledge_base.json
+
+' ============================================================
+' CROSS-SERVICE COMMUNICATION
+' ============================================================
+NginxGateway ..> CustomerViews : / /customer /gateway
+NginxGateway ..> StaffViews : /staff
+NginxGateway ..> AuthApiViews : /api/auth
+NginxGateway ..> ProductViewSet : /api/products
+NginxGateway ..> CategoryViewSet : /api/categories
+NginxGateway ..> OrderViews : /api/cart /api/orders
+NginxGateway ..> PaymentViews : /api/payments
+NginxGateway ..> ShipmentViews : /api/shipments
+NginxGateway ..> ChatbotViews : /api/chat
+
+CustomerServiceClient ..> ProductViewSet : catalog REST
+CustomerServiceClient ..> CategoryViewSet : category REST
+CustomerServiceClient ..> OrderViews : cart/order REST + internal key
+CustomerServiceClient ..> ChatbotViews : chatbot proxy
+OrderServiceClients ..> PaymentViews : payment REST + internal key
+OrderServiceClients ..> ShipmentViews : shipment REST + internal key
+ChatbotService ..> ProductViewSet : live catalog REST
+RAGKnowledgeBase ..> ProductViewSet : build product docs
+
+' ============================================================
+' DATABASE DEPENDENCIES
+' ============================================================
+AuthUser ..> UserDB
+BlogPost ..> UserDB
+Testimonial ..> UserDB
+LegacyUserMapping ..> UserDB
+
+Category ..> ProductDB
+Product ..> ProductDB
+
+CartItem ..> OrderDB
+SavedItem ..> OrderDB
+CompareItem ..> OrderDB
+Order ..> OrderDB
+OrderItem ..> OrderDB
+OrderShipping ..> OrderDB
+
+Payment ..> PaymentDB
+Shipment ..> ShippingDB
+BehaviorEvent ..> ChatbotDB
+
+@enduml

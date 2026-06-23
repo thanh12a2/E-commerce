@@ -1,0 +1,903 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>API Gateway Workspace</title>
+  <style>
+    :root {
+      --bg: #f3f0e7;
+      --panel: #fffdf7;
+      --panel-soft: #f7f2e7;
+      --ink: #171510;
+      --muted: #676155;
+      --line: #ddd6c7;
+      --accent: #bd4a1d;
+      --accent-dark: #6a2d16;
+      --accent-soft: #ffe6d8;
+      --ok: #236244;
+      --shadow: 0 18px 44px rgba(31, 23, 18, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Trebuchet MS", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, #fff7dd 0, rgba(255, 247, 221, 0.2) 22%, transparent 48%),
+        linear-gradient(180deg, #f8f5ed 0%, var(--bg) 45%, #ede7da 100%);
+    }
+
+    a { color: inherit; }
+
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.9em;
+      word-break: break-word;
+    }
+
+    .shell {
+      width: min(1180px, 94vw);
+      margin: 0 auto;
+      padding: 28px 0 52px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border-radius: 28px;
+      padding: 30px;
+      color: #fff7f2;
+      background:
+        radial-gradient(circle at 85% 22%, rgba(255, 208, 184, 0.24) 0, rgba(255, 208, 184, 0) 28%),
+        linear-gradient(135deg, #19140f 0%, #2d2018 48%, #52311f 100%);
+      box-shadow: 0 24px 54px rgba(27, 18, 13, 0.18);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -60px -60px auto;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      background: rgba(255, 221, 203, 0.1);
+      filter: blur(6px);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(255, 233, 221, 0.14);
+      border: 1px solid rgba(255, 233, 221, 0.16);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.9rem, 3vw, 3.2rem);
+      line-height: 1.05;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 76ch;
+      color: #f2d8cb;
+      font-size: 1rem;
+      line-height: 1.65;
+    }
+
+    .hero-actions,
+    .hero-meta {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .hero-actions { margin-top: 18px; }
+    .hero-meta { margin-top: 16px; }
+
+    .hero-link,
+    .hero-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 10px 15px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    .hero-link {
+      background: #ffd7c4;
+      color: #27140b;
+    }
+
+    .hero-link.secondary {
+      background: rgba(255, 233, 221, 0.12);
+      color: #fff2eb;
+      border: 1px solid rgba(255, 233, 221, 0.18);
+    }
+
+    .hero-chip {
+      background: rgba(255, 233, 221, 0.12);
+      color: #ffd9c9;
+      border: 1px solid rgba(255, 233, 221, 0.14);
+    }
+
+    .layout {
+      margin-top: 22px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .stat-card,
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-card {
+      padding: 18px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+    }
+
+    .stat-value {
+      margin-top: 10px;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--accent-dark);
+    }
+
+    .panel {
+      padding: 22px;
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .panel-head h2 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .panel-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      max-width: 70ch;
+      line-height: 1.6;
+    }
+
+    .code-grid,
+    .service-grid,
+    .section-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .code-grid,
+    .service-grid {
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+
+    .code-card,
+    .service-card,
+    .section-card {
+      background: var(--panel-soft);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .code-card h3,
+    .service-card h3,
+    .section-card h3 {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .code-card p,
+    .service-card p,
+    .section-card p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 0.94rem;
+    }
+
+    .path-pill,
+    .route-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 12px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: #fff4ec;
+      border: 1px solid #f1d8ca;
+      color: var(--accent-dark);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .service-links,
+    .service-notes,
+    .route-list,
+    .route-meta-list {
+      margin: 12px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+    }
+
+    .service-links li,
+    .service-notes li,
+    .route-list li,
+    .route-meta-list li {
+      margin-bottom: 8px;
+      line-height: 1.55;
+    }
+
+    .service-links a {
+      color: var(--accent-dark);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .section-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .section-card {
+      background: linear-gradient(180deg, #fffdf8 0%, #f8f3e9 100%);
+    }
+
+    .section-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .section-count {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent-dark);
+      font-size: 0.82rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .route-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+    }
+
+    .route-card {
+      background: #fffef9;
+      border: 1px solid #e8decf;
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .route-methods {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .method-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #efe3d5;
+      color: #68422e;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .route-label {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .mini-table {
+      margin-top: 14px;
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .mini-table td {
+      vertical-align: top;
+      padding: 10px 0;
+      border-top: 1px solid #efe6d9;
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+
+    .mini-table td:first-child {
+      width: 132px;
+      color: var(--muted);
+      font-weight: 700;
+      padding-right: 16px;
+    }
+
+    .footer-note {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 960px) {
+      .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 720px) {
+      .shell {
+        width: min(96vw, 1180px);
+        padding-top: 18px;
+      }
+
+      .hero,
+      .panel,
+      .stat-card {
+        border-radius: 18px;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <script id="gateway-data" type="application/json">{{ gateway_json|safe }}</script>
+  <div class="shell">
+    <section class="hero">
+      <div class="eyebrow">Dedicated API Gateway Workspace</div>
+      <h1>API Gateway control surface for the 4-service commerce stack</h1>
+      <p>
+        This page is the dedicated web workspace for the gateway layer. Its source of truth now lives inside
+        <code>services/user_service/customer/api_gateway/</code>, so the route catalog, service topology, and JSON index
+        are maintained in one place instead of being scattered across templates and views.
+      </p>
+      <div class="hero-actions">
+        <a class="hero-link" id="gateway-index-link" href="#">Open JSON index</a>
+        <a class="hero-link secondary" id="gateway-customer-link" href="http://localhost:8000/customer/dashboard/">Open customer UI</a>
+        <a class="hero-link secondary" id="gateway-staff-link" href="http://localhost:8003/staff/dashboard/">Open staff UI</a>
+      </div>
+      <div class="hero-meta">
+        <span class="hero-chip" id="hero-route-count">8 gateway routes</span>
+        <span class="hero-chip" id="hero-downstream-count">3 downstream services</span>
+        <span class="hero-chip" id="hero-entrypoint-count">15 public entrypoints</span>
+      </div>
+    </section>
+
+    <div class="layout">
+      <section class="stats">
+        <article class="stat-card">
+          <div class="stat-label">Services tracked</div>
+          <div class="stat-value" id="stat-service-count">4</div>
+        </article>
+        <article class="stat-card">
+          <div class="stat-label">Gateway sections</div>
+          <div class="stat-value" id="stat-section-count">4</div>
+        </article>
+        <article class="stat-card">
+          <div class="stat-label">Route groups</div>
+          <div class="stat-value" id="stat-route-count">8</div>
+        </article>
+        <article class="stat-card">
+          <div class="stat-label">Public entrypoints</div>
+          <div class="stat-value" id="stat-entrypoint-count">15</div>
+        </article>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Dedicated code zone</h2>
+            <p>
+              The gateway now has a clear home in code. Definitions, registry building, and public views are split so the
+              API gateway can evolve without burying route knowledge inside unrelated customer logic.
+            </p>
+          </div>
+        </div>
+        <div class="code-grid" id="code-grid"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Downstream topology</h2>
+            <p>
+              Every browser-facing flow still terminates at <code>user_service</code>. The gateway forwards catalog,
+              commerce, and AI work to the right service while keeping public website contracts stable.
+            </p>
+          </div>
+        </div>
+        <div class="service-grid" id="service-grid"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Gateway route workspace</h2>
+            <p>
+              Routes are grouped by what they do, not by file. This makes it easier to inspect the real public contract
+              of the gateway and the upstream services each flow depends on.
+            </p>
+          </div>
+        </div>
+        <div class="section-grid" id="section-grid"></div>
+
+        <p class="footer-note">
+          This workspace is generated from local gateway metadata, so you can inspect the public contract at
+          <code>/gateway/</code> and pull the same source of truth as JSON from <code>/gateway/apis/</code>.
+        </p>
+      </section>
+    </div>
+  </div>
+  <script>
+    const gatewayPreviewFallback = {
+      message: "Gateway API index",
+      gateway_index_url: "http://localhost:8000/gateway/apis/",
+      gateway_dashboard_url: "http://localhost:8000/gateway/",
+      services: {
+        user_service: {
+          key: "user_service",
+          label: "User Service",
+          role: "Shared auth source, browser-facing UI, and orchestration edge for customer and staff traffic.",
+          localhost: "http://localhost:8000",
+          public_urls: [
+            { label: "Customer UI", url: "http://localhost:8000" },
+            { label: "Staff UI", url: "http://localhost:8003" }
+          ],
+          internal: "http://localhost:8000",
+          notes: "Terminates browser traffic, owns auth, and fans out to downstream services without duplicating their business logic.",
+          touchpoints: ["Customer app on :8000", "Staff app on :8003"]
+        },
+        product_service: {
+          key: "product_service",
+          label: "Product Service",
+          role: "Unified catalog source for categories, product lists, and product detail payloads.",
+          localhost: "http://localhost:8001",
+          public_urls: [{ label: "Public host", url: "http://localhost:8001" }],
+          internal: "http://product-service:8000",
+          notes: "Provides catalog data that the gateway normalizes before rendering in the storefront.",
+          touchpoints: ["Category navigation", "Dashboard results", "Product detail"]
+        },
+        order_service: {
+          key: "order_service",
+          label: "Order Service",
+          role: "Internal-first commerce state owner for cart, saved items, compare, checkout, orders, and analytics.",
+          localhost: "internal-only",
+          public_urls: [{ label: "Public host", url: "internal-only" }],
+          internal: "http://order-service:8000",
+          notes: "Receives signed internal requests from user_service for all mutable commerce state.",
+          touchpoints: ["Cart state", "Checkout", "Order history"]
+        },
+        chatbot_service: {
+          key: "chatbot_service",
+          label: "Chatbot Service",
+          role: "AI reply generation, retrieval, recommendation ranking, and behavior-aware chat orchestration.",
+          localhost: "http://localhost:8005",
+          public_urls: [{ label: "Public host", url: "http://localhost:8005" }],
+          internal: "http://chatbot-service:8000",
+          notes: "Serves the proxied chatbot reply endpoint consumed by the website widget and AI suggestion builders.",
+          touchpoints: ["Chat widget", "Dashboard AI block", "Cart AI block"]
+        }
+      },
+      service_cards: [
+        {
+          key: "user_service",
+          label: "User Service",
+          role: "Shared auth source, browser-facing UI, and orchestration edge for customer and staff traffic.",
+          localhost: "http://localhost:8000",
+          public_urls: [
+            { label: "Customer UI", url: "http://localhost:8000" },
+            { label: "Staff UI", url: "http://localhost:8003" }
+          ],
+          internal: "http://localhost:8000",
+          notes: "Terminates browser traffic, owns auth, and fans out to downstream services without duplicating their business logic.",
+          touchpoints: ["Customer app on :8000", "Staff app on :8003"]
+        },
+        {
+          key: "product_service",
+          label: "Product Service",
+          role: "Unified catalog source for categories, product lists, and product detail payloads.",
+          localhost: "http://localhost:8001",
+          public_urls: [{ label: "Public host", url: "http://localhost:8001" }],
+          internal: "http://product-service:8000",
+          notes: "Provides catalog data that the gateway normalizes before rendering in the storefront.",
+          touchpoints: ["Category navigation", "Dashboard results", "Product detail"]
+        },
+        {
+          key: "order_service",
+          label: "Order Service",
+          role: "Internal-first commerce state owner for cart, saved items, compare, checkout, orders, and analytics.",
+          localhost: "internal-only",
+          public_urls: [{ label: "Public host", url: "internal-only" }],
+          internal: "http://order-service:8000",
+          notes: "Receives signed internal requests from user_service for all mutable commerce state.",
+          touchpoints: ["Cart state", "Checkout", "Order history"]
+        },
+        {
+          key: "chatbot_service",
+          label: "Chatbot Service",
+          role: "AI reply generation, retrieval, recommendation ranking, and behavior-aware chat orchestration.",
+          localhost: "http://localhost:8005",
+          public_urls: [{ label: "Public host", url: "http://localhost:8005" }],
+          internal: "http://chatbot-service:8000",
+          notes: "Serves the proxied chatbot reply endpoint consumed by the website widget and AI suggestion builders.",
+          touchpoints: ["Chat widget", "Dashboard AI block", "Cart AI block"]
+        }
+      ],
+      sections: [
+        {
+          key: "discovery",
+          title: "Catalog Discovery",
+          summary: "Storefront browse flows are normalized here before they touch the catalog service.",
+          route_count: 2,
+          routes: [
+            {
+              title: "Dashboard browse gateway",
+              description: "Loads category navigation and product listing data, then renders the unified storefront page.",
+              methods: ["GET"],
+              consumer_surface: "Customer dashboard filters and search results",
+              public_paths: ["/customer/dashboard/"],
+              public_urls: ["http://localhost:8000/customer/dashboard/"],
+              upstream: "product_service",
+              upstream_urls: [
+                "http://product-service:8000/api/categories/",
+                "http://product-service:8000/api/products/"
+              ],
+              request_shape: "Query string filters: q, category, stock, price_range, sort, brand",
+              response_shape: "Rendered HTML storefront with normalized product cards and optional AI suggestions"
+            },
+            {
+              title: "Product detail gateway",
+              description: "Fetches one product, applies category-aware decoration, and preserves slug-based storefront URLs.",
+              methods: ["GET"],
+              consumer_surface: "Customer product detail page",
+              public_paths: ["/customer/products/{category_slug}/{product_id}/"],
+              public_urls: ["http://localhost:8000/customer/products/{category_slug}/{product_id}/"],
+              upstream: "product_service",
+              upstream_urls: ["http://product-service:8000/api/products/{product_id}/"],
+              request_shape: "Path params: category_slug and product_id",
+              response_shape: "Rendered HTML detail page with recommendation and chat widget context"
+            }
+          ]
+        },
+        {
+          key: "commerce",
+          title: "Commerce State",
+          summary: "Mutable cart and order actions stay behind the gateway and are delegated to order_service.",
+          route_count: 3,
+          routes: [
+            {
+              title: "Cart state gateway",
+              description: "Keeps cart state out of user_service while preserving customer-facing cart routes.",
+              methods: ["GET", "POST", "DELETE"],
+              consumer_surface: "Cart page plus add/remove cart actions",
+              public_paths: ["/customer/cart/", "/customer/cart/add/", "/customer/cart/remove/{item_id}/"],
+              public_urls: [
+                "http://localhost:8000/customer/cart/",
+                "http://localhost:8000/customer/cart/add/",
+                "http://localhost:8000/customer/cart/remove/{item_id}/"
+              ],
+              upstream: "order_service",
+              upstream_urls: ["http://order-service:8000/api/cart/", "http://order-service:8000/api/cart/{item_id}/"],
+              request_shape: "User-scoped cart payloads normalized in customer/services.py",
+              response_shape: "Rendered cart page plus JSON mutation responses"
+            },
+            {
+              title: "Saved and compare gateway",
+              description: "Delegates collection state to order_service without exposing internal endpoints to the browser.",
+              methods: ["GET", "POST", "DELETE"],
+              consumer_surface: "Saved items and compare experiences",
+              public_paths: ["/customer/saved/", "/customer/saved/toggle/", "/customer/compare/"],
+              public_urls: [
+                "http://localhost:8000/customer/saved/",
+                "http://localhost:8000/customer/saved/toggle/",
+                "http://localhost:8000/customer/compare/"
+              ],
+              upstream: "order_service",
+              upstream_urls: [
+                "http://order-service:8000/api/saved/",
+                "http://order-service:8000/api/saved/toggle/",
+                "http://order-service:8000/api/compare/"
+              ],
+              request_shape: "User id plus product payloads for toggle and removal actions",
+              response_shape: "Rendered collection pages plus JSON mutation responses"
+            },
+            {
+              title: "Checkout and order gateway",
+              description: "Owns browser-facing checkout and order pages while order_service remains the state authority.",
+              methods: ["GET", "POST"],
+              consumer_surface: "Checkout form, order list, and pay-order flow",
+              public_paths: ["/customer/checkout/", "/customer/orders/", "/customer/orders/{order_id}/pay/"],
+              public_urls: [
+                "http://localhost:8000/customer/checkout/",
+                "http://localhost:8000/customer/orders/",
+                "http://localhost:8000/customer/orders/{order_id}/pay/"
+              ],
+              upstream: "order_service",
+              upstream_urls: [
+                "http://order-service:8000/api/checkout/",
+                "http://order-service:8000/api/orders/",
+                "http://order-service:8000/api/orders/{order_id}/pay/"
+              ],
+              request_shape: "Shipping payloads and pay-order commands signed with ORDER_SERVICE_INTERNAL_KEY",
+              response_shape: "Rendered order pages plus payment and checkout result payloads"
+            }
+          ]
+        },
+        {
+          key: "ai",
+          title: "AI Assistant",
+          summary: "Customer-facing AI routes are proxied through user_service to preserve a stable website contract.",
+          route_count: 1,
+          routes: [
+            {
+              title: "Chatbot reply proxy",
+              description: "Preserves the website contract while forwarding AI requests to chatbot_service.",
+              methods: ["POST"],
+              consumer_surface: "Floating chat widget and AI recommendation builders",
+              public_paths: ["/customer/chatbot/reply/"],
+              public_urls: ["http://localhost:8000/customer/chatbot/reply/"],
+              upstream: "chatbot_service",
+              upstream_urls: ["http://chatbot-service:8000/api/chat/reply/"],
+              request_shape: "message, current_product, user_context, user_ref, limit",
+              response_shape: "Stable JSON contract: answer, recommendations, citations, source, fallback flags"
+            }
+          ]
+        },
+        {
+          key: "ops",
+          title: "Operations",
+          summary: "Inspection and analytics routes that help validate the gateway and downstream behavior.",
+          route_count: 2,
+          routes: [
+            {
+              title: "Gateway analytics inspection",
+              description: "Surfaces order analytics through the gateway for staff-aware operational reporting.",
+              methods: ["GET"],
+              consumer_surface: "Operational order analytics used from user_service",
+              public_paths: ["/customer/staff/analytics/"],
+              public_urls: ["http://localhost:8000/customer/staff/analytics/"],
+              upstream: "order_service",
+              upstream_urls: ["http://order-service:8000/api/analytics/customers/"],
+              request_shape: "customer_limit, recent_limit, range_days",
+              response_shape: "JSON analytics snapshot enriched with local user metadata"
+            },
+            {
+              title: "Gateway self-inspection",
+              description: "Dedicated inspection surface for understanding how user_service fronts the rest of the system.",
+              methods: ["GET"],
+              consumer_surface: "Operational gateway workspace and JSON registry",
+              public_paths: ["/gateway/", "/gateway/apis/"],
+              public_urls: ["http://localhost:8000/gateway/", "http://localhost:8000/gateway/apis/"],
+              upstream: "user_service",
+              upstream_urls: [],
+              request_shape: "No upstream payload; generated from local gateway metadata",
+              response_shape: "HTML workspace and JSON API index"
+            }
+          ]
+        }
+      ],
+      stats: {
+        service_count: 4,
+        section_count: 4,
+        route_count: 8,
+        downstream_count: 3,
+        public_entrypoint_count: 15
+      },
+      code_locations: [
+        {
+          label: "Gateway route catalog",
+          path: "services/user_service/customer/api_gateway/definitions.py",
+          description: "Static source of truth for downstream services, route groups, and public contract metadata."
+        },
+        {
+          label: "Gateway registry builder",
+          path: "services/user_service/customer/api_gateway/registry.py",
+          description: "Builds resolved URLs, sections, stats, and the JSON payload used by the dedicated gateway page."
+        },
+        {
+          label: "Gateway views",
+          path: "services/user_service/customer/views.py",
+          description: "Exposes the dedicated HTML workspace at /gateway/ and the JSON index at /gateway/apis/."
+        }
+      ]
+    };
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function renderList(items, className, isLink) {
+      if (!items || !items.length) {
+        return '<span class="route-pill">Local registry only</span>';
+      }
+      return `<ul class="${className}">${items.map((item) => {
+        if (typeof item === "string") {
+          return `<li><code>${escapeHtml(item)}</code></li>`;
+        }
+        const label = escapeHtml(item.label || "");
+        const url = escapeHtml(item.url || "");
+        if (isLink && /^https?:/i.test(url)) {
+          return `<li><strong>${label}:</strong> <a href="${url}" target="_blank" rel="noreferrer">${url}</a></li>`;
+        }
+        return `<li><strong>${label}:</strong> <code>${url}</code></li>`;
+      }).join("")}</ul>`;
+    }
+
+    function loadGatewayData() {
+      const script = document.getElementById("gateway-data");
+      if (!script) {
+        return gatewayPreviewFallback;
+      }
+
+      try {
+        const raw = script.textContent.trim();
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.stats && parsed.sections) {
+          return parsed;
+        }
+      } catch (error) {
+      }
+
+      return gatewayPreviewFallback;
+    }
+
+    function setText(id, value) {
+      const element = document.getElementById(id);
+      if (element) {
+        element.textContent = value;
+      }
+    }
+
+    function renderGatewayWorkspace(data) {
+      document.getElementById("gateway-index-link").href = data.gateway_index_url || "#";
+
+      setText("hero-route-count", `${data.stats.route_count} gateway routes`);
+      setText("hero-downstream-count", `${data.stats.downstream_count} downstream services`);
+      setText("hero-entrypoint-count", `${data.stats.public_entrypoint_count} public entrypoints`);
+      setText("stat-service-count", data.stats.service_count);
+      setText("stat-section-count", data.stats.section_count);
+      setText("stat-route-count", data.stats.route_count);
+      setText("stat-entrypoint-count", data.stats.public_entrypoint_count);
+
+      const codeGrid = document.getElementById("code-grid");
+      codeGrid.innerHTML = (data.code_locations || []).map((item) => `
+        <article class="code-card">
+          <h3>${escapeHtml(item.label)}</h3>
+          <p>${escapeHtml(item.description)}</p>
+          <div class="path-pill"><code>${escapeHtml(item.path)}</code></div>
+        </article>
+      `).join("");
+
+      const serviceGrid = document.getElementById("service-grid");
+      serviceGrid.innerHTML = (data.service_cards || []).map((service) => `
+        <article class="service-card">
+          <h3>${escapeHtml(service.label)}</h3>
+          <p>${escapeHtml(service.role)}</p>
+          <ul class="service-links">
+            <li><strong>Primary host:</strong> <code>${escapeHtml(service.localhost)}</code></li>
+            <li><strong>Internal URL:</strong> <code>${escapeHtml(service.internal)}</code></li>
+          </ul>
+          ${renderList(service.public_urls || [], "service-links", true)}
+          <ul class="service-notes">${(service.touchpoints || []).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+          <div class="path-pill">${escapeHtml(service.notes)}</div>
+        </article>
+      `).join("");
+
+      const sectionGrid = document.getElementById("section-grid");
+      sectionGrid.innerHTML = (data.sections || []).map((section) => `
+        <article class="section-card">
+          <div class="section-top">
+            <div>
+              <h3>${escapeHtml(section.title)}</h3>
+              <p>${escapeHtml(section.summary)}</p>
+            </div>
+            <div class="section-count">${escapeHtml(section.route_count)} route groups</div>
+          </div>
+          <div class="route-grid">
+            ${(section.routes || []).map((route) => `
+              <article class="route-card">
+                <h3>${escapeHtml(route.title)}</h3>
+                <p>${escapeHtml(route.description)}</p>
+                <div class="route-methods">${(route.methods || []).map((method) => `<span class="method-badge">${escapeHtml(method)}</span>`).join("")}</div>
+                <div class="route-label">Consumer surface</div>
+                <div class="route-pill">${escapeHtml(route.consumer_surface)}</div>
+                <table class="mini-table">
+                  <tr>
+                    <td>Public paths</td>
+                    <td>${renderList(route.public_paths || [], "route-list", false)}</td>
+                  </tr>
+                  <tr>
+                    <td>Public URLs</td>
+                    <td>${renderList(route.public_urls || [], "route-list", false)}</td>
+                  </tr>
+                  <tr>
+                    <td>Upstream</td>
+                    <td><code>${escapeHtml(route.upstream)}</code></td>
+                  </tr>
+                  <tr>
+                    <td>Upstream URLs</td>
+                    <td>${renderList(route.upstream_urls || [], "route-list", false)}</td>
+                  </tr>
+                  <tr>
+                    <td>Request shape</td>
+                    <td>${escapeHtml(route.request_shape)}</td>
+                  </tr>
+                  <tr>
+                    <td>Response shape</td>
+                    <td>${escapeHtml(route.response_shape)}</td>
+                  </tr>
+                </table>
+              </article>
+            `).join("")}
+          </div>
+        </article>
+      `).join("");
+    }
+
+    renderGatewayWorkspace(loadGatewayData());
+  </script>
+</body>
+</html>

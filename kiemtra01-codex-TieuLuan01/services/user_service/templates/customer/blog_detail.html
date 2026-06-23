@@ -1,0 +1,51 @@
+{% extends 'customer/base.html' %}
+{% block title %}{{ blog_post.title }} — Nike Lab Blog{% endblock %}
+{% block content %}
+
+<!-- Breadcrumb -->
+<div style="margin-bottom:24px;font-size:12px;color:var(--dim);display:flex;gap:6px;align-items:center;">
+  <a href="/customer/dashboard/" style="color:var(--muted);">Home</a>
+  <span>/</span>
+  <a href="/customer/dashboard/#section-stories" style="color:var(--muted);">Blog</a>
+  <span>/</span>
+  <span style="color:var(--text);">{{ blog_post.title }}</span>
+</div>
+
+<article class="blog-detail-shell" data-reveal>
+  <p class="blog-meta">
+    <span class="section-tag" style="margin-right:8px;">{{ blog_post.category }}</span>
+    {{ blog_post.published_at }} · by {{ blog_post.author }}
+  </p>
+  <h1 class="blog-title">{{ blog_post.title }}</h1>
+  <p style="color:var(--muted);font-size:16px;margin:0 0 24px;line-height:1.6;">{{ blog_post.excerpt }}</p>
+  <img loading="eager" class="blog-hero" src="{{ blog_post.hero_image_url|default:'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1400&q=80' }}" alt="{{ blog_post.title }}">
+  <div class="blog-body">
+    {{ blog_post.body|linebreaksbr }}
+  </div>
+  <div style="margin-top:28px;">
+    <a class="cta-outline btn-sm" href="/customer/dashboard/#section-stories" id="blog-back-btn">← Back to Blog</a>
+  </div>
+</article>
+
+{% if related_posts %}
+<section class="content-block" data-reveal>
+  <div class="section-head">
+    <span class="section-tag">More from the Blog</span>
+    <h2>Keep <em>Reading</em></h2>
+  </div>
+  <div class="story-grid">
+    {% for post in related_posts %}
+    <article class="story-card" data-reveal>
+      <img loading="lazy" class="story-image" src="{{ post.hero_image_url|default:'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=800&q=80' }}" alt="{{ post.title }}">
+      <div class="story-body">
+        <p class="story-meta">{{ post.category }} · {{ post.published_at }}</p>
+        <h3>{{ post.title }}</h3>
+        <p>{{ post.excerpt }}</p>
+        <a class="story-link" href="{% url 'customer_blog_detail' slug=post.slug %}" id="related-blog-{{ post.id }}">Read Article →</a>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

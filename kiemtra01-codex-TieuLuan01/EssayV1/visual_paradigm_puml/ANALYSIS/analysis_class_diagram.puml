@@ -1,0 +1,280 @@
+@startuml ECommerce-Analysis-Class-Diagram
+
+' ============================================================
+' STYLE - Visual Paradigm-like class diagram
+' ============================================================
+skinparam classBackgroundColor #AEE2F0
+skinparam classBorderColor #2C7DA0
+skinparam classHeaderBackgroundColor #5BA3C2
+skinparam classHeaderFontColor #FFFFFF
+skinparam classFontColor #000000
+skinparam classFontSize 11
+skinparam classAttributeFontSize 10
+skinparam ArrowColor #2C7DA0
+skinparam ArrowFontSize 9
+skinparam ArrowFontColor #1A1A1A
+skinparam Padding 4
+skinparam linetype ortho
+hide circle
+hide methods
+
+title Analysis Class Diagram - E-Commerce Microservices System
+
+' ============================================================
+' USER / WEB EDGE CONTEXT
+' ============================================================
+class Customer {
+  -id : int
+  -username : String
+  -first_name : String
+  -last_name : String
+  -email : String
+  -password : String
+  -is_staff : bool
+  -is_superuser : bool
+  -is_active : bool
+  -date_joined : DateTime
+  -last_login : DateTime
+}
+
+class BlogPost {
+  -id : int
+  -title : String
+  -slug : String
+  -category : String
+  -author : String
+  -excerpt : String
+  -body : String
+  -hero_image_url : String
+  -published_at : Date
+  -created_at : DateTime
+}
+
+class Testimonial {
+  -id : int
+  -name : String
+  -role : String
+  -rating : int
+  -quote : String
+  -avatar_url : String
+  -is_featured : bool
+  -created_at : DateTime
+}
+
+' ============================================================
+' CATALOG CONTEXT
+' ============================================================
+class Category {
+  -id : int
+  -name : String
+  -slug : String
+  -description : String
+  -hero_image_url : String
+  -sort_order : int
+  -is_active : bool
+}
+
+class Product {
+  -id : int
+  -name : String
+  -brand : String
+  -description : String
+  -image_url : String
+  -price : Decimal
+  -stock : int
+  -created_at : DateTime
+  -updated_at : DateTime
+}
+
+' ============================================================
+' CART / ORDER CONTEXT
+' Cart is implemented inside order_service in the real source.
+' ============================================================
+class CartItem {
+  -id : int
+  -user_id : int
+  -category_slug : String
+  -category_name : String
+  -product_id : int
+  -product_name : String
+  -product_brand : String
+  -product_image_url : String
+  -unit_price : Decimal
+  -quantity : int
+  -created_at : DateTime
+  -updated_at : DateTime
+}
+
+class SavedItem {
+  -id : int
+  -user_id : int
+  -category_slug : String
+  -category_name : String
+  -product_id : int
+  -product_name : String
+  -product_brand : String
+  -product_image_url : String
+  -unit_price : Decimal
+  -created_at : DateTime
+}
+
+class CompareItem {
+  -id : int
+  -user_id : int
+  -category_slug : String
+  -category_name : String
+  -product_id : int
+  -product_name : String
+  -product_brand : String
+  -product_image_url : String
+  -unit_price : Decimal
+  -stock : int
+  -created_at : DateTime
+}
+
+class Order {
+  -id : int
+  -user_id : int
+  -total_amount : Decimal
+  -payment_status : String
+  -shipping_status : String
+  -source : String
+  -source_order_id : int
+  -paid_at : DateTime
+  -created_at : DateTime
+  -updated_at : DateTime
+}
+
+class OrderItem {
+  -id : int
+  -category_slug : String
+  -category_name : String
+  -product_id : int
+  -product_name : String
+  -product_brand : String
+  -product_image_url : String
+  -unit_price : Decimal
+  -quantity : int
+}
+
+class OrderShipping {
+  -id : int
+  -recipient_name : String
+  -phone : String
+  -address_line : String
+  -city_or_region : String
+  -postal_code : String
+  -country : String
+  -note : String
+}
+
+' ============================================================
+' PAYMENT CONTEXT
+' ============================================================
+class Payment {
+  -id : int
+  -order_id : int
+  -user_id : int
+  -amount : Decimal
+  -status : String
+  -paid_at : DateTime
+  -created_at : DateTime
+  -updated_at : DateTime
+}
+
+' ============================================================
+' SHIPPING CONTEXT
+' ============================================================
+class Shipment {
+  -id : int
+  -order_id : int
+  -user_id : int
+  -recipient_name : String
+  -phone : String
+  -address_line : String
+  -city_or_region : String
+  -postal_code : String
+  -country : String
+  -note : String
+  -status : String
+  -created_at : DateTime
+  -updated_at : DateTime
+}
+
+' ============================================================
+' AI CONSULTATION CONTEXT
+' ============================================================
+class BehaviorEvent {
+  -id : int
+  -user_ref : String
+  -event_type : String
+  -category_slug : String
+  -product_id : int
+  -metadata : JSON
+  -created_at : DateTime
+}
+
+class Recommendation <<API Response DTO>> {
+  -product_id : int
+  -name : String
+  -category_slug : String
+  -score : float
+  -reason : String
+}
+
+class ChatbotReply <<API Response DTO>> {
+  -answer : String
+  -source : String
+  -fallback_used : bool
+  -error_code : String
+}
+
+' ============================================================
+' RELATIONSHIPS
+' Format: ClassA "role mult" -- "mult role" ClassB
+' "--"  : business association, no diamond
+' "*--" : Composition - composite, filled diamond at whole/owner
+' "o--" : Aggregation - shared, hollow diamond at whole/group
+' "..>" : dependency / runtime use only
+' ============================================================
+
+' --- USER CONTENT ---
+' BlogPost.author and Testimonial are editorial text/content, not database FKs.
+Customer "author 0..1" -- "0..* posts" BlogPost : author text
+Customer "quoted customer 0..1" -- "0..* testimonials" Testimonial : testimonial content
+
+' --- CATALOG ---
+Category "category 1" o-- "0..* products" Product : shared catalog group
+
+' --- CUSTOMER COMMERCE STATE ---
+Customer "customer 1" -- "0..* cartItems" CartItem : owns active cart
+Customer "customer 1" -- "0..* savedItems" SavedItem : saves
+Customer "customer 1" -- "0..* compareItems" CompareItem : compares
+Customer "customer 1" -- "0..* orders" Order : places
+
+' --- CART / SAVED / COMPARE -> PRODUCT SNAPSHOT ---
+CartItem "cartItem 0..*" -- "1 product" Product : product snapshot
+SavedItem "savedItem 0..*" -- "1 product" Product : product snapshot
+CompareItem "compareItem 0..*" -- "1 product" Product : product snapshot
+
+' --- ORDER ---
+Order "order 1" *-- "1..* items" OrderItem : composite checkout items
+Order "order 1" *-- "0..1 shippingAddress" OrderShipping : composite shipping address
+OrderItem "orderItem 0..*" -- "1 product" Product : product snapshot
+
+' --- PAYMENT / SHIPPING ---
+Order "order 1" -- "0..1 payment" Payment : payment record
+Order "order 1" -- "0..1 shipment" Shipment : shipment record
+Payment "payment 0..*" -- "1 customer" Customer : paid by
+Shipment "shipment 0..*" -- "1 customer" Customer : delivered to
+
+' --- AI CONSULTATION ---
+Customer "customer 1" -- "0..* behaviorEvents" BehaviorEvent : asks / browses
+Customer "customer 1" -- "0..* chatbotReplies" ChatbotReply : receives
+BehaviorEvent "event 0..*" -- "0..1 category" Category : category context
+BehaviorEvent "event 0..*" -- "0..1 product" Product : product context
+ChatbotReply "reply 1" o-- "0..* recommendations" Recommendation : shared response list
+Recommendation "recommendation 0..*" -- "1 product" Product : recommends
+Recommendation "recommendation 0..*" -- "0..1 category" Category : category context
+
+@enduml

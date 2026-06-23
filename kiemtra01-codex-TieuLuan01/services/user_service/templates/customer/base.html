@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Nike Lab — your premium tech e-commerce experience">
+  <title>{% block title %}Nike Lab Portal{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='28'>🎧</text></svg>">
+</head>
+<body class="store-body">
+
+
+  <!-- Top navigation -->
+  <header class="top-nav-wrap">
+    <div class="top-nav shell">
+      <a class="logo-mark" href="/customer/dashboard/" aria-label="Nike Lab Home">
+        Nike<span>Lab</span>
+      </a>
+      <nav class="menu-pill" aria-label="Main navigation">
+        <a href="/customer/dashboard/#section-categories">Categories</a>
+        <a href="/customer/dashboard/#section-products">Products</a>
+        <a href="/customer/dashboard/#section-stories">Blog</a>
+        <a href="/customer/dashboard/#section-faq">FAQ</a>
+      </nav>
+      <div class="nav-actions">
+        <a class="ghost-btn" href="/customer/cart/" id="nav-cart-btn">
+          🛒 Cart
+          {% if cart_count %}<span class="cart-badge">{{ cart_count }}</span>{% endif %}
+        </a>
+        <a class="ghost-btn" href="/customer/saved/" id="nav-saved-btn">Saved</a>
+        <a class="ghost-btn" href="/customer/orders/" id="nav-orders-btn">Orders</a>
+        <a class="ghost-btn" href="/customer/logout/" id="nav-logout-btn">Logout</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="page-wrap shell page-enter">
+    {% include 'partials/messages.html' %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Chatbot widget -->
+  {% if request.user.is_authenticated and not request.user.is_staff and not request.user.is_superuser %}
+  {% include 'partials/chat_widget.html' with chatbot_current_product=chatbot_current_product %}
+  {% endif %}
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="shell footer-grid">
+      <div>
+        <p class="footer-logo">Nike Lab</p>
+        <p class="footer-muted">Your premium tech destination — handpicked catalog across 10 categories.</p>
+      </div>
+      <div>
+        <p class="footer-title">Quick Links</p>
+        <a href="/customer/dashboard/">Home</a>
+        <a href="/customer/cart/">Cart</a>
+        <a href="/customer/saved/">Saved Items</a>
+        <a href="/customer/orders/">My Orders</a>
+        <a href="/customer/compare/">Compare</a>
+        <a href="/gateway/">API Gateway</a>
+      </div>
+      <div>
+        <p class="footer-title">Categories</p>
+        <a href="/customer/dashboard/?category=all">All Categories</a>
+        {% for item in category_navigation|slice:":5" %}
+        <a href="/customer/dashboard/?category={{ item.slug }}">{{ item.name }}</a>
+        {% endfor %}
+      </div>
+      <div>
+        <p class="footer-title">Support</p>
+        <p class="footer-muted">support@nikelab.local</p>
+        <p class="footer-muted" style="margin-top:8px;">Mon–Fri, 9am–6pm</p>
+      </div>
+    </div>
+    <div class="shell footer-copy">© 2026 Nike Lab. All rights reserved.</div>
+  </footer>
+
+  <script src="/static/js/site.js"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

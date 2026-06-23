@@ -1,0 +1,201 @@
+{% extends 'staff/base.html' %}
+{% block title %}Manage Products{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <h1>Products Catalog</h1>
+    <p class="subtitle">Create, edit, and delete products across all 10 categories.</p>
+  </div>
+</div>
+
+<div class="grid-two staff-dashboard-grid">
+
+  <!-- Left: Create + Edit forms -->
+  <div>
+    <!-- Create form -->
+    <div class="panel">
+      <h2>Create New Product</h2>
+      <p class="panel-subtitle">Add a new product to the unified catalog.</p>
+      <form method="post" class="item-form" id="create-item-form">
+        {% csrf_token %}
+        <input type="hidden" name="intent" value="create">
+        <input type="hidden" name="return_category" value="{{ selected_category }}">
+        <p><label>Category</label>{{ create_form.service }}</p>
+        <p><label>Name</label>{{ create_form.name }}</p>
+        <p><label>Brand</label>{{ create_form.brand }}</p>
+        <p><label>Description</label>{{ create_form.description }}</p>
+        <p><label>Image URL</label>{{ create_form.image_url }}</p>
+        <p><label>Price ($)</label>{{ create_form.price }}</p>
+        <p><label>Stock</label>{{ create_form.stock }}</p>
+        <button type="submit" class="table-btn primary" id="create-product-btn" style="width:auto;">＋ Create Product</button>
+      </form>
+    </div>
+
+    <!-- Edit form -->
+    <div class="panel">
+      <h2>Edit Product</h2>
+      <p id="edit-empty-note" class="panel-subtitle">Click a row or the Edit button from the table to pre-fill this form.</p>
+      <form method="post" class="item-form" id="update-item-form">
+        {% csrf_token %}
+        <input type="hidden" name="intent" value="update">
+        <input type="hidden" name="return_category" value="{{ selected_category }}">
+        {{ update_form.product_id }}
+        <p><label>Category</label>{{ update_form.service }}</p>
+        <p><label>Name</label>{{ update_form.name }}</p>
+        <p><label>Brand</label>{{ update_form.brand }}</p>
+        <p><label>Description</label>{{ update_form.description }}</p>
+        <p><label>Image URL</label>{{ update_form.image_url }}</p>
+        <p><label>Price ($)</label>{{ update_form.price }}</p>
+        <p><label>Stock</label>{{ update_form.stock }}</p>
+        <div class="table-actions-row" style="margin-top:4px;">
+          <button type="submit" class="table-btn primary" id="update-product-btn">💾 Save Changes</button>
+          <button type="button" id="clear-edit-btn" class="table-btn">✕ Clear</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Right: Product listing -->
+  <div class="panel">
+    <div class="staff-list-header">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+        <div>
+          <h2>{{ selected_category_label }}</h2>
+          <p class="panel-subtitle">Filter by category, then click a row to edit.</p>
+        </div>
+        <a class="table-btn" href="/staff/items/?category=all">Show All</a>
+      </div>
+      <div class="service-filter-row">
+        {% for value, label in category_filter_choices %}
+        <a class="service-filter-chip {% if selected_category == value %}active{% endif %}" href="/staff/items/?category={{ value }}" id="cat-filter-{{ value }}">{{ label }}</a>
+        {% endfor %}
+      </div>
+    </div>
+
+    {% if items %}
+    <div class="table-scroll-wrap">
+      <table class="staff-items-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Brand</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+          <tr
+            class="staff-item-row"
+            data-row-editable
+            data-service="{{ item.category_slug }}"
+            data-product-id="{{ item.id }}"
+            data-name="{{ item.name|escapejs }}"
+            data-brand="{{ item.brand|default:''|escapejs }}"
+            data-description="{{ item.description|default:''|escapejs }}"
+            data-image-url="{{ item.image_url|default:''|escapejs }}"
+            data-price="{{ item.price }}"
+            data-stock="{{ item.stock }}"
+          >
+            <td style="color:var(--dim);">{{ item.id }}</td>
+            <td style="font-weight:600;">{{ item.name }}</td>
+            <td>{{ item.brand|default:'N/A' }}</td>
+            <td>
+              <span class="badge-status badge-pending" style="font-size:9px;">{{ item.category_name|default:item.category_slug|title }}</span>
+            </td>
+            <td style="color:var(--accent);font-weight:700;">${{ item.price }}</td>
+            <td class="{% if item.stock == 0 %}stock-out{% elif item.stock <= 5 %}stock-low{% else %}stock-ok{% endif %}">{{ item.stock }}</td>
+            <td>
+              <div class="table-actions-row">
+                <button type="button" class="table-btn edit-trigger" id="item-edit-{{ item.id }}">Edit</button>
+                <form method="post" class="confirm-delete-form" data-product-name="{{ item.name|escapejs }}" style="margin:0;">
+                  {% csrf_token %}
+                  <input type="hidden" name="intent" value="delete">
+                  <input type="hidden" name="return_category" value="{{ selected_category }}">
+                  <input type="hidden" name="delete-service" value="{{ item.category_slug }}">
+                  <input type="hidden" name="delete-product_id" value="{{ item.id }}">
+                  <button type="submit" class="table-btn danger" id="item-delete-{{ item.id }}">Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="msg msg-warning" style="margin-top:8px;">No products found for this category, or the catalog service is unavailable.</div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  (function () {
+    const updateForm = document.getElementById("update-item-form");
+    const clearBtn   = document.getElementById("clear-edit-btn");
+    const emptyNote  = document.getElementById("edit-empty-note");
+    const editBtns   = document.querySelectorAll(".edit-trigger");
+    const editRows   = document.querySelectorAll("[data-row-editable]");
+    const delForms   = document.querySelectorAll(".confirm-delete-form");
+
+    const f = {
+      productId:   document.getElementById("id_update-product_id"),
+      service:     document.getElementById("id_update-service"),
+      name:        document.getElementById("id_update-name"),
+      brand:       document.getElementById("id_update-brand"),
+      description: document.getElementById("id_update-description"),
+      imageUrl:    document.getElementById("id_update-image_url"),
+      price:       document.getElementById("id_update-price"),
+      stock:       document.getElementById("id_update-stock"),
+    };
+
+    function loadRow(row) {
+      if (!row) return;
+      f.productId.value   = row.dataset.productId || "";
+      f.service.value     = row.dataset.service   || f.service.options[0]?.value;
+      f.name.value        = row.dataset.name        || "";
+      f.brand.value       = row.dataset.brand       || "";
+      f.description.value = row.dataset.description || "";
+      f.imageUrl.value    = row.dataset.imageUrl    || "";
+      f.price.value       = row.dataset.price       || "";
+      f.stock.value       = row.dataset.stock       || "0";
+      emptyNote.textContent = `Editing product #${row.dataset.productId}`;
+      updateForm.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    editBtns.forEach(btn => btn.addEventListener("click", e => {
+      e.preventDefault();
+      loadRow(btn.closest("tr"));
+    }));
+
+    editRows.forEach(row => row.addEventListener("click", e => {
+      if (e.target.closest("button, form, a")) return;
+      loadRow(row);
+    }));
+
+    delForms.forEach(form => form.addEventListener("submit", e => {
+      const name = form.dataset.productName || "this product";
+      if (!confirm(`Delete "${name}"? This cannot be undone.`)) e.preventDefault();
+    }));
+
+    updateForm.addEventListener("submit", e => {
+      if (!f.productId.value) {
+        e.preventDefault();
+        alert("Select a product from the table first.");
+        return;
+      }
+      if (!confirm("Save changes to this product?")) e.preventDefault();
+    });
+
+    clearBtn.addEventListener("click", () => {
+      updateForm.reset();
+      f.productId.value = "";
+      emptyNote.textContent = "Click a row or the Edit button to load product data here.";
+    });
+  })();
+</script>
+{% endblock %}

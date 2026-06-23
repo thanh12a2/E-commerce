@@ -1,0 +1,141 @@
+{% extends 'customer/base.html' %}
+{% block title %}Shopping Cart - Nike Lab{% endblock %}
+{% block content %}
+
+<div class="section-head">
+  <span class="section-tag">Cart</span>
+  <h1>Your <em>Shopping Cart</em></h1>
+  <p>Review your items, then fill in shipping details to place an order.</p>
+</div>
+
+{% if cart_items %}
+<div class="cart-layout" id="cart-layout">
+
+  <div class="items-shell">
+    <div class="items-header">
+      <h2 style="font-size:16px;font-weight:700;margin:0 0 4px;">{{ cart_items|length }} item{{ cart_items|length|pluralize }}</h2>
+    </div>
+    <div class="items-list">
+      {% for item in cart_items %}
+      <div class="item-row cart-row">
+        <div class="item-thumb">
+          <a href="/customer/products/{{ item.category_slug|default:item.product_service }}/{{ item.product_id }}/" id="cart-item-img-{{ item.id }}">
+            <img loading="lazy" src="{{ item.product_image_url|default:'https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&w=300&q=80' }}" data-fallback-src="https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&w=300&q=80" onerror="this.onerror=null;this.src=this.dataset.fallbackSrc;" alt="{{ item.product_name }}">
+          </a>
+        </div>
+        <div class="item-info">
+          <h3>{{ item.product_name }}</h3>
+          <p>{{ item.product_brand|default:'N/A' }} | {{ item.category_name|default:item.category_slug|default:item.product_service|title }}</p>
+          <p style="margin-top:4px;color:var(--muted);">Qty: <strong style="color:var(--text);">{{ item.quantity }}</strong></p>
+        </div>
+        <div class="item-price">${{ item.total_price }}</div>
+        <form method="post" action="/customer/cart/remove/{{ item.id }}/" id="cart-remove-form-{{ item.id }}">
+          {% csrf_token %}
+          <button type="submit" class="danger-btn" id="cart-remove-{{ item.id }}">Remove</button>
+        </form>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="cart-summary">
+      <span class="cart-total-label">Cart Total</span>
+      <span class="cart-total-value">${{ cart_total }}</span>
+    </div>
+  </div>
+
+  <div class="checkout-section" id="checkout-form-section">
+    <h2>Shipping Details</h2>
+    <form method="post" action="/customer/checkout/" id="checkout-form">
+      {% csrf_token %}
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="checkout-name">Recipient Name *</label>
+          <input id="checkout-name" type="text" name="recipient_name" placeholder="Full name" required>
+        </div>
+        <div class="form-group">
+          <label for="checkout-phone">Phone *</label>
+          <input id="checkout-phone" type="text" name="phone" placeholder="+84..." required>
+        </div>
+        <div class="form-group full-width">
+          <label for="checkout-address">Address *</label>
+          <input id="checkout-address" type="text" name="address_line" placeholder="Street address" required>
+        </div>
+        <div class="form-group">
+          <label for="checkout-city">City / Region *</label>
+          <input id="checkout-city" type="text" name="city_or_region" placeholder="Ho Chi Minh City" required>
+        </div>
+        <div class="form-group">
+          <label for="checkout-postal">Postal Code *</label>
+          <input id="checkout-postal" type="text" name="postal_code" placeholder="700000" required>
+        </div>
+        <div class="form-group">
+          <label for="checkout-country">Country *</label>
+          <input id="checkout-country" type="text" name="country" placeholder="VN" value="VN" required>
+        </div>
+        <div class="form-group full-width">
+          <label for="checkout-note">Note</label>
+          <textarea id="checkout-note" name="note" placeholder="Optional delivery note..."></textarea>
+        </div>
+      </div>
+      <div class="checkout-actions">
+        <button type="submit" class="cta-green btn-lg" id="checkout-submit-btn">Place Order - ${{ cart_total }}</button>
+        <a href="/customer/dashboard/" class="cta-outline checkout-secondary-btn" id="continue-shopping-btn">Continue Shopping</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% if cart_recommendations and cart_recommendations.recommendations %}
+<section class="content-block" id="cart-recommendations" data-reveal>
+  <div class="section-head">
+    <span class="section-tag">Recommended</span>
+    <h2>Add More To <em>Your Cart</em></h2>
+    <p>{{ cart_recommendations.summary }}</p>
+  </div>
+  <div class="product-grid best-seller-grid">
+    {% for item in cart_recommendations.recommendations %}
+    <article class="store-card compact-card">
+      <a class="product-image mini-image" href="{{ item.url }}" id="cart-rec-img-{{ item.id }}">
+        <span class="product-service">{{ item.category_name|default:item.category_slug|title }}</span>
+        <img loading="lazy" src="{{ item.image_url }}" data-fallback-src="{{ item.image_fallback_url }}" onerror="this.onerror=null;this.src=this.dataset.fallbackSrc;" alt="{{ item.name }}">
+      </a>
+      <div class="product-meta">
+        <h3>{{ item.name }}</h3>
+        <p>{{ item.brand|default:'Generic Brand' }}</p>
+        <p style="font-size:12px;color:var(--dim);">{{ item.category_name|default:item.category_slug|title }}</p>
+      </div>
+      <div class="price-row">
+        <strong>${{ item.price }}</strong>
+        <span class="{% if item.stock == 0 %}stock-out{% elif item.stock <= 5 %}stock-low{% else %}stock-ok{% endif %}">
+          {% if item.stock == 0 %}Out of stock{% elif item.stock <= 5 %}Only {{ item.stock }} left{% else %}{{ item.stock }} in stock{% endif %}
+        </span>
+      </div>
+      <div class="card-actions-row">
+        <a class="cta-light" href="{{ item.url }}" id="cart-rec-view-{{ item.id }}">View</a>
+        <form method="post" action="/customer/cart/add/" class="add-form-inline" id="cart-rec-form-{{ item.id }}">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="/customer/cart/#cart-recommendations">
+          <input type="hidden" name="category_slug" value="{{ item.category_slug }}">
+          <input type="hidden" name="category_name" value="{{ item.category_name }}">
+          <input type="hidden" name="product_id" value="{{ item.id }}">
+          <input type="hidden" name="product_name" value="{{ item.name }}">
+          <input type="hidden" name="product_brand" value="{{ item.brand }}">
+          <input type="hidden" name="product_image_url" value="{{ item.image_url }}">
+          <input type="hidden" name="unit_price" value="{{ item.price }}">
+          <input type="hidden" name="stock" value="{{ item.stock }}">
+          <button class="cta-green" type="submit" id="cart-rec-add-{{ item.id }}" {% if item.stock == 0 %}disabled style="opacity:.4;"{% endif %}>Add to Cart</button>
+        </form>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% else %}
+<div class="empty-state" style="margin-top:24px;text-align:center;">
+  <p style="font-size:32px;margin-bottom:12px;">&#128722;</p>
+  <p>Your cart is empty.</p>
+  <a class="cta-green btn-lg" style="margin-top:16px;display:inline-flex;" href="/customer/dashboard/" id="go-shop-btn">Start Shopping</a>
+</div>
+{% endif %}
+{% endblock %}

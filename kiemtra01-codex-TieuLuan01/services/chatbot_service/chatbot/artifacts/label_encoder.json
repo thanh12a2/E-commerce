@@ -1,0 +1,27 @@
+{
+  "label_name": "target_next_category_slug",
+  "labels": [
+    "business-laptops",
+    "gaming-laptops",
+    "ultrabooks",
+    "smartphones",
+    "tablets",
+    "smartwatches",
+    "audio",
+    "keyboards-mice",
+    "chargers-cables",
+    "bags-stands"
+  ],
+  "index": {
+    "business-laptops": 0,
+    "gaming-laptops": 1,
+    "ultrabooks": 2,
+    "smartphones": 3,
+    "tablets": 4,
+    "smartwatches": 5,
+    "audio": 6,
+    "keyboards-mice": 7,
+    "chargers-cables": 8,
+    "bags-stands": 9
+  }
+}

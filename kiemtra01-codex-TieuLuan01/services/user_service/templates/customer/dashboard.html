@@ -1,0 +1,408 @@
+{% extends 'customer/base.html' %}
+{% block title %}Customer Dashboard — Nike Lab{% endblock %}
+{% block content %}
+
+<!-- Smart Search Filter -->
+<section class="smart-search-wrap" data-reveal>
+  <form class="smart-search-form" method="get" action="/customer/dashboard/#section-products" id="filter-form">
+    
+    <div class="smart-search-input-wrap">
+      <input type="text" name="q" id="id_q" value="{{ filters.q|default:'' }}" placeholder="Search product name, brand, or category..." autocomplete="off">
+      <button type="submit" aria-label="Search" class="search-submit-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      </button>
+    </div>
+
+    <!-- The Popup -->
+    <div class="smart-search-popup" id="smart-search-popup">
+      <div class="popup-header">
+        <span class="section-tag">Filter</span>
+        <h2>REFINE <em>RESULTS</em></h2>
+        <button type="button" class="popup-close" id="smart-search-close" aria-label="Close filters">✕</button>
+      </div>
+
+      <div class="filters-toolbar">
+        <div class="field-group">
+          <label for="id_category">CATEGORY</label>
+          {{ filter_form.category }}
+        </div>
+        <div class="field-group">
+          <label for="id_stock">STOCK</label>
+          {{ filter_form.stock }}
+        </div>
+        <div class="field-group">
+          <label for="id_price_range">PRICE</label>
+          {{ filter_form.price_range }}
+        </div>
+        <div class="field-group">
+          <label for="id_sort">SORT</label>
+          {{ filter_form.sort }}
+        </div>
+        <div class="field-group">
+          <label for="id_brand">BRAND</label>
+          {{ filter_form.brand }}
+        </div>
+      </div>
+      
+      <div class="field-actions">
+        <button class="button-primary" type="submit" id="filter-apply-btn">Apply</button>
+        <a class="button-secondary" href="/customer/dashboard/#section-products" id="filter-reset-btn">Reset</a>
+      </div>
+      
+      <div class="filters-active">
+        <strong>ACTIVE:</strong>
+        {% if filters.category != 'all' %}<span class="filter-chip">Category: {{ filters.category|title }}</span>{% endif %}
+        {% if filters.stock != 'all' %}<span class="filter-chip">In Stock Only</span>{% endif %}
+        {% if filters.price_range != 'all' %}<span class="filter-chip">Price: {{ filters.price_range }}</span>{% endif %}
+        {% if filters.brand != 'all' %}<span class="filter-chip">Brand: {{ filters.brand }}</span>{% endif %}
+        {% if filters.sort != 'newest' %}<span class="filter-chip">Sort: {{ filters.sort }}</span>{% endif %}
+        {% if filters.category == 'all' and filters.stock == 'all' and filters.price_range == 'all' and filters.brand == 'all' and filters.sort == 'newest' %}
+        <span class="filter-chip" style="opacity:.5;border-color:var(--border-lt);">Default filters</span>
+        {% endif %}
+      </div>
+    </div>
+  </form>
+</section>
+
+<!-- Hero Carousel -->
+<section class="hero-landing" id="section-hero" data-reveal>
+  <div class="hero-carousel" id="hero-carousel">
+    <div class="hero-slides">
+      <img class="hero-img hero-slide active" src="https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&w=1920&q=80" alt="Tech setup 1" loading="lazy">
+      <img class="hero-img hero-slide" src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1920&q=80" alt="Tech setup 2" loading="lazy">
+      <img class="hero-img hero-slide" src="https://images.unsplash.com/photo-1531297172867-2144a107386d?auto=format&fit=crop&w=1920&q=80" alt="Tech setup 3" loading="lazy">
+      <img class="hero-img hero-slide" src="https://images.unsplash.com/photo-1504639725590-34d0984388bd?auto=format&fit=crop&w=1920&q=80" alt="Tech setup 4" loading="lazy">
+      <img class="hero-img hero-slide" src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1920&q=80" alt="Tech setup 5" loading="lazy">
+    </div>
+    <button type="button" class="hero-arrow hero-arrow-left" id="hero-prev" aria-label="Previous image">‹</button>
+    <button type="button" class="hero-arrow hero-arrow-right" id="hero-next" aria-label="Next image">›</button>
+  </div>
+  <div class="hero-content">
+    <h1 class="display-campaign">ELEVATE YOUR SETUP</h1>
+    <p>Upgrade your active lifestyle with the next generation of minimalist technology. Exclusive member offers today.</p>
+    <div class="hero-cta-row">
+      <a class="button-primary" href="#section-products" id="hero-shop-btn">SHOP NOW</a>
+      <a class="button-outline-on-image" href="/customer/cart/" id="hero-cart-btn">VIEW CART ({{ cart_count }})</a>
+    </div>
+  </div>
+</section>
+
+<!-- Categories -->
+<section id="section-categories" class="category-grid-wrap" data-reveal>
+  <div class="section-head">
+    <span class="section-tag">Catalog</span>
+    <h2>Browse by <em>Category</em></h2>
+    <p>10 curated categories across laptops, mobile, audio, and accessories.</p>
+  </div>
+  <div class="category-grid">
+    {% for item in category_sections %}
+    <article class="category-card">
+      <h3>{{ item.title }}</h3>
+      <p>{{ item.description }}</p>
+      <a href="/customer/dashboard/?category={{ item.query }}#section-products" id="cat-link-{{ item.query }}">Browse {{ item.title }} →</a>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Products -->
+<section id="section-products" class="products-section" data-reveal>
+  <div class="section-head" style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;">
+    <div>
+      <span class="section-tag">Products</span>
+      <h2>Fresh Picks <em>{{ products_page.number }}/{{ products_page.paginator.num_pages }}</em></h2>
+    </div>
+    <span style="color:var(--muted);font-size:13px;">{{ products_page.paginator.count }} results</span>
+  </div>
+
+  {% if dashboard_ai %}
+  {% include 'partials/ai_suggestion_block.html' with ai_block=dashboard_ai %}
+  {% endif %}
+
+  {% if products_page.object_list %}
+  <div class="product-grid" id="product-grid">
+    {% for product in products_page.object_list %}
+    <article class="store-card" data-reveal style="position: relative;">
+      <a class="product-image" href="/customer/products/{{ product.category_slug }}/{{ product.id }}/" id="product-img-{{ product.id }}">
+        <span class="product-service">{{ product.category_name|default:product.category_slug|title }}</span>
+        <img loading="lazy" src="{{ product.image_url }}" data-fallback-src="{{ product.image_fallback_url }}" onerror="this.onerror=null;this.src=this.dataset.fallbackSrc;" alt="{{ product.name }}">
+      </a>
+      
+      <!-- Floating Save Icon -->
+      <form class="save-floating-form" method="post" action="/customer/saved/toggle/" id="save-form-{{ product.id }}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}#section-products">
+        <input type="hidden" name="category_slug" value="{{ product.category_slug }}">
+        <input type="hidden" name="category_name" value="{{ product.category_name }}">
+        <input type="hidden" name="product_id" value="{{ product.id }}">
+        <input type="hidden" name="product_name" value="{{ product.name }}">
+        <input type="hidden" name="product_brand" value="{{ product.brand }}">
+        <input type="hidden" name="product_image_url" value="{{ product.image_url }}">
+        <input type="hidden" name="unit_price" value="{{ product.price }}">
+        <input type="hidden" name="stock" value="{{ product.stock }}">
+        <button class="save-floating-btn" type="submit" id="save-btn-{{ product.id }}" title="Save">
+          {% if product.is_saved %}♥{% else %}♡{% endif %}
+        </button>
+      </form>
+
+      <div class="product-meta">
+        <h3>{{ product.name }}</h3>
+        <p>{{ product.brand|default:'Generic Brand' }}</p>
+        <p style="font-size:12px;color:var(--dim);">{{ product.description|truncatechars:80 }}</p>
+      </div>
+      <div class="price-row">
+        <strong>${{ product.price }}</strong>
+        <span class="{% if product.stock == 0 %}stock-out{% elif product.stock <= 5 %}stock-low{% else %}stock-ok{% endif %}">
+          {% if product.stock == 0 %}Out of stock{% elif product.stock <= 5 %}Only {{ product.stock }} left{% else %}{{ product.stock }} in stock{% endif %}
+        </span>
+      </div>
+
+      <form class="add-form" method="post" action="/customer/cart/add/" id="cart-form-{{ product.id }}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}#section-products">
+        <input type="hidden" name="category_slug" value="{{ product.category_slug }}">
+        <input type="hidden" name="category_name" value="{{ product.category_name }}">
+        <input type="hidden" name="product_id" value="{{ product.id }}">
+        <input type="hidden" name="product_name" value="{{ product.name }}">
+        <input type="hidden" name="product_brand" value="{{ product.brand }}">
+        <input type="hidden" name="product_image_url" value="{{ product.image_url }}">
+        <input type="hidden" name="unit_price" value="{{ product.price }}">
+        <input type="hidden" name="stock" value="{{ product.stock }}">
+        <button type="submit" class="button-primary" id="add-cart-{{ product.id }}" {% if product.stock == 0 %}disabled style="opacity:.4;"{% endif %}>
+          🛒 Add to Cart
+        </button>
+      </form>
+    </article>
+    {% endfor %}
+  </div>
+
+  {% if products_page.has_other_pages %}
+  <nav class="pager" aria-label="Products pagination">
+    {% if products_page.has_previous %}
+    <a class="button-secondary btn-sm" href="{{ product_prev_url }}" id="products-prev-btn">← Prev</a>
+    {% else %}<span class="pager-disabled">← Prev</span>{% endif %}
+    <span class="pager-current">Page {{ products_page.number }} / {{ products_page.paginator.num_pages }}</span>
+    {% if products_page.has_next %}
+    <a class="button-secondary btn-sm" href="{{ product_next_url }}" id="products-next-btn">Next →</a>
+    {% else %}<span class="pager-disabled">Next →</span>{% endif %}
+  </nav>
+  {% endif %}
+
+  {% else %}
+  <div class="empty-state">No products matched your filters. Try broadening your search or resetting filters.</div>
+  {% endif %}
+</section>
+
+<!-- Best Sellers -->
+<section class="content-block" data-reveal>
+  <div class="section-head">
+    <span class="section-tag">Top Picks</span>
+    <h2>Best <em>Sellers</em></h2>
+  </div>
+  <div class="product-grid best-seller-grid">
+    {% for product in best_sellers %}
+    <article class="store-card compact-card" data-reveal>
+      <a class="product-image mini-image" href="/customer/products/{{ product.category_slug }}/{{ product.id }}/" id="best-img-{{ product.id }}">
+        <span class="product-service">{{ product.category_name|default:product.category_slug|title }}</span>
+        <img loading="lazy" src="{{ product.image_url }}" data-fallback-src="{{ product.image_fallback_url }}" onerror="this.onerror=null;this.src=this.dataset.fallbackSrc;" alt="{{ product.name }}">
+      </a>
+      <div class="product-meta">
+        <h3>{{ product.name }}</h3>
+        <p>{{ product.brand|default:'Generic Brand' }}</p>
+      </div>
+      <div class="price-row">
+        <strong>${{ product.price }}</strong>
+        <span>{{ product.stock }} in stock</span>
+      </div>
+      <a class="button-secondary btn-sm" href="/customer/products/{{ product.category_slug }}/{{ product.id }}/" id="best-view-{{ product.id }}">Quick View →</a>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Blog -->
+<section id="section-stories" class="content-block" data-reveal>
+  <div class="section-head center">
+    <span class="section-tag">Stories</span>
+    <h2>Latest <em>Blog Posts</em></h2>
+    <p>Tech insights, buying guides, and product deep dives.</p>
+  </div>
+  {% if blog_page.object_list %}
+  <div class="story-grid">
+    {% for blog in blog_page.object_list %}
+    <article class="story-card" data-reveal>
+      <img loading="lazy" class="story-image" src="{{ blog.hero_image_url|default:'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=800&q=80' }}" alt="{{ blog.title }}">
+      <div class="story-body">
+        <p class="story-meta">{{ blog.category }} · {{ blog.published_at }} · {{ blog.author }}</p>
+        <h3>{{ blog.title }}</h3>
+        <p>{{ blog.excerpt }}</p>
+        <a class="story-link" href="/customer/blog/{{ blog.slug }}/" id="blog-link-{{ blog.id }}">Read Article →</a>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% if blog_page.has_other_pages %}
+  <nav class="pager" aria-label="Blog pagination">
+    {% if blog_page.has_previous %}
+    <a class="button-secondary btn-sm" href="{{ blog_prev_url }}" id="blog-prev-btn">← Prev</a>
+    {% else %}<span class="pager-disabled">← Prev</span>{% endif %}
+    <span class="pager-current">Page {{ blog_page.number }} / {{ blog_page.paginator.num_pages }}</span>
+    {% if blog_page.has_next %}
+    <a class="button-secondary btn-sm" href="{{ blog_next_url }}" id="blog-next-btn">Next →</a>
+    {% else %}<span class="pager-disabled">Next →</span>{% endif %}
+  </nav>
+  {% endif %}
+  {% else %}
+  <div class="empty-state">No blog posts available yet.</div>
+  {% endif %}
+</section>
+
+<!-- Testimonials -->
+<section class="content-block" data-reveal>
+  <div class="section-head center">
+    <span class="section-tag">Social Proof</span>
+    <h2>What Customers <em>Say</em></h2>
+  </div>
+  {% if testimonials %}
+  <div class="product-grid testimonial-grid">
+    {% for item in testimonials %}
+    <article class="store-card testimonial-card" data-reveal>
+      <div class="testimonial-top">
+        <img loading="lazy" class="testimonial-avatar" src="{{ item.avatar_url|default:'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?auto=format&fit=crop&w=300&q=80' }}" alt="{{ item.name }}">
+        <div>
+          <p class="testimonial-name">{{ item.name }}</p>
+          <p class="testimonial-role">{{ item.role }}</p>
+        </div>
+      </div>
+      <div class="testimonial-body">
+        <p class="stars">{{ item.stars }}</p>
+        <p class="testimonial-quote">{{ item.quote }}</p>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">No testimonials yet.</div>
+  {% endif %}
+</section>
+
+<!-- FAQ -->
+<section id="section-faq" class="content-block" data-reveal>
+  <div class="section-head center">
+    <span class="section-tag">FAQ</span>
+    <h2>Frequently Asked <em>Questions</em></h2>
+  </div>
+  <div class="faq-list">
+    {% for faq in faq_items %}
+    <details class="faq-row">
+      <summary class="faq-summary">
+        {{ faq.question }}
+        <span class="faq-icon">+</span>
+      </summary>
+      <div class="faq-content">
+        <p>{{ faq.answer }}</p>
+      </div>
+    </details>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Newsletter -->
+<section id="section-newsletter" class="newsletter-block" data-reveal>
+  <span class="section-tag">Stay in the Loop</span>
+  <div class="section-head center" style="margin-top:12px;">
+    <h2>Get Weekly <em>Tech Picks</em></h2>
+    <p>Curated recommendations across all categories, direct to your inbox.</p>
+  </div>
+  <form class="newsletter-form" onsubmit="return false;" id="newsletter-form">
+    <input id="newsletter-email" type="email" placeholder="you@example.com" required>
+    <button class="button-primary" type="submit" id="newsletter-submit-btn">Subscribe</button>
+  </form>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // --- Smart Search Popup ---
+  const searchInput = document.getElementById('id_q');
+  const popup = document.getElementById('smart-search-popup');
+  const closeBtn = document.getElementById('smart-search-close');
+  const searchWrap = document.querySelector('.smart-search-wrap');
+
+  if (searchInput && popup && closeBtn) {
+    // Open popup on click
+    searchInput.addEventListener('click', function() {
+      popup.classList.add('is-active');
+      searchWrap.classList.add('is-active');
+    });
+
+    // Close popup on X click
+    closeBtn.addEventListener('click', function() {
+      popup.classList.remove('is-active');
+      searchWrap.classList.remove('is-active');
+    });
+
+    // Close when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!searchWrap.contains(e.target)) {
+        popup.classList.remove('is-active');
+        searchWrap.classList.remove('is-active');
+      }
+    });
+  }
+
+  // --- Hero Carousel ---
+  const slides = document.querySelectorAll('.hero-slide');
+  const prevBtn = document.getElementById('hero-prev');
+  const nextBtn = document.getElementById('hero-next');
+  let currentSlide = 0;
+  let slideInterval;
+
+  function showSlide(index) {
+    slides.forEach((slide, i) => {
+      slide.classList.remove('active');
+      if (i === index) slide.classList.add('active');
+    });
+  }
+
+  function nextSlide() {
+    currentSlide = (currentSlide + 1) % slides.length;
+    showSlide(currentSlide);
+  }
+
+  function prevSlide() {
+    currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+    showSlide(currentSlide);
+  }
+
+  function startAutoSlide() {
+    slideInterval = setInterval(nextSlide, 2000);
+  }
+
+  function resetAutoSlide() {
+    clearInterval(slideInterval);
+    startAutoSlide();
+  }
+
+  if (slides.length > 0) {
+    startAutoSlide();
+    
+    if (prevBtn) {
+      prevBtn.addEventListener('click', () => {
+        prevSlide();
+        resetAutoSlide();
+      });
+    }
+    
+    if (nextBtn) {
+      nextBtn.addEventListener('click', () => {
+        nextSlide();
+        resetAutoSlide();
+      });
+    }
+  }
+});
+</script>
+{% endblock %}

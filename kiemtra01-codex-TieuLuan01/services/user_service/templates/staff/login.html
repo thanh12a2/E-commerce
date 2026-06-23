@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Staff Login — Nike Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="/static/css/staff_styles.css">
+</head>
+<body class="staff-login-page">
+  <div class="login-card">
+    <div class="logo">Nike <span style="color:var(--muted);font-weight:400;">Lab</span> Staff</div>
+    <h1>Staff Sign In</h1>
+    <p class="subtitle">Manage catalog, customers, and orders from one secure console.</p>
+    {% include 'partials/messages.html' %}
+    {% if form.non_field_errors %}
+    <div class="msg msg-error" style="margin-bottom:14px;">{{ form.non_field_errors.0 }}</div>
+    {% endif %}
+    <form method="post" id="staff-login-form">
+      {% csrf_token %}
+      <p>
+        <label for="id_username">Username</label>
+        {{ form.username }}
+        {% if form.username.errors %}<span style="color:var(--error);font-size:12px;">{{ form.username.errors.0 }}</span>{% endif %}
+      </p>
+      <p>
+        <label for="id_password">Password</label>
+        {{ form.password }}
+      </p>
+      <button type="submit" id="staff-login-submit">Sign In</button>
+    </form>
+    <p class="auth-switch">Need an account? <a href="/staff/register/">Create staff account</a></p>
+  </div>
+</body>
+</html>

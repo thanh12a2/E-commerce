@@ -1,0 +1,288 @@
+@startuml ECommerce-ORM-Persistent-DataModel
+
+' ============================================================
+' STYLE - Visual Paradigm-like ORM persistent data model
+' ============================================================
+skinparam classBackgroundColor #AEE2F0
+skinparam classBorderColor #2C7DA0
+skinparam classHeaderBackgroundColor #5BA3C2
+skinparam classHeaderFontColor #FFFFFF
+skinparam classFontColor #000000
+skinparam classFontSize 11
+skinparam classAttributeFontSize 10
+skinparam ArrowColor #2C7DA0
+skinparam ArrowFontSize 9
+skinparam ArrowFontColor #1A1A1A
+skinparam Padding 4
+skinparam linetype ortho
+hide circle
+hide methods
+
+title ORM Persistent / Data Model - E-Commerce Microservices System
+
+' ============================================================
+' USER SERVICE - user_db - MySQL
+' Django built-in auth_user plus customer app editorial content tables.
+' ============================================================
+class "auth_user" as AuthUser {
+  <<ORM Persistable>>
+  -ID : int
+  -username : varchar(150)
+  -first_name : varchar(150)
+  -last_name : varchar(150)
+  -email : varchar(254)
+  -password : varchar(128)
+  -is_staff : bool
+  -is_superuser : bool
+  -is_active : bool
+  -date_joined : datetime
+  -last_login : datetime
+}
+
+class "customer_blogpost" as BlogPost {
+  <<ORM Persistable>>
+  -ID : bigint
+  -title : varchar(220)
+  -slug : varchar(50)
+  -category : varchar(80)
+  -author : varchar(120)
+  -excerpt : text
+  -body : text
+  -hero_image_url : varchar
+  -published_at : date
+  -created_at : datetime
+}
+
+class "customer_testimonial" as Testimonial {
+  <<ORM Persistable>>
+  -ID : bigint
+  -name : varchar(120)
+  -role : varchar(120)
+  -rating : smallint
+  -quote : text
+  -avatar_url : varchar
+  -is_featured : bool
+  -created_at : datetime
+}
+
+class "customer_legacyusermapping" as LegacyUserMapping {
+  <<ORM Persistable>>
+  -ID : bigint
+  -user_id : int
+  -legacy_source : varchar(20)
+  -legacy_user_id : int
+  -legacy_username : varchar(150)
+  -legacy_email : varchar(254)
+  -note : text
+  -created_at : datetime
+}
+
+' ============================================================
+' PRODUCT SERVICE - product_db - PostgreSQL
+' ============================================================
+class "catalog_category" as Category {
+  <<ORM Persistable>>
+  -ID : bigint
+  -name : varchar(120)
+  -slug : varchar(120)
+  -description : text
+  -hero_image_url : varchar
+  -sort_order : int
+  -is_active : bool
+}
+
+class "catalog_product" as Product {
+  <<ORM Persistable>>
+  -ID : bigint
+  -category_id : bigint
+  -name : varchar(255)
+  -brand : varchar(120)
+  -description : text
+  -image_url : varchar
+  -price : decimal(12,2)
+  -stock : int
+  -created_at : datetime
+  -updated_at : datetime
+}
+
+' ============================================================
+' ORDER SERVICE - order_db - MySQL
+' Cart is represented by user-scoped orders_cartitem rows.
+' Product fields are snapshots copied from product_service.
+' ============================================================
+class "orders_cartitem" as CartItem {
+  <<ORM Persistable>>
+  -ID : bigint
+  -user_id : int
+  -category_slug : varchar(120)
+  -category_name : varchar(120)
+  -product_id : int
+  -product_name : varchar(255)
+  -product_brand : varchar(120)
+  -product_image_url : varchar
+  -unit_price : decimal(12,2)
+  -quantity : int
+  -created_at : datetime
+  -updated_at : datetime
+}
+
+class "orders_saveditem" as SavedItem {
+  <<ORM Persistable>>
+  -ID : bigint
+  -user_id : int
+  -category_slug : varchar(120)
+  -category_name : varchar(120)
+  -product_id : int
+  -product_name : varchar(255)
+  -product_brand : varchar(120)
+  -product_image_url : varchar
+  -unit_price : decimal(12,2)
+  -created_at : datetime
+}
+
+class "orders_compareitem" as CompareItem {
+  <<ORM Persistable>>
+  -ID : bigint
+  -user_id : int
+  -category_slug : varchar(120)
+  -category_name : varchar(120)
+  -product_id : int
+  -product_name : varchar(255)
+  -product_brand : varchar(120)
+  -product_image_url : varchar
+  -unit_price : decimal(12,2)
+  -stock : int
+  -created_at : datetime
+}
+
+class "orders_order" as Order {
+  <<ORM Persistable>>
+  -ID : bigint
+  -user_id : int
+  -total_amount : decimal(12,2)
+  -payment_status : varchar(20)
+  -shipping_status : varchar(20)
+  -source : varchar(20)
+  -source_order_id : int
+  -paid_at : datetime
+  -created_at : datetime
+  -updated_at : datetime
+}
+
+class "orders_orderitem" as OrderItem {
+  <<ORM Persistable>>
+  -ID : bigint
+  -order_id : bigint
+  -category_slug : varchar(120)
+  -category_name : varchar(120)
+  -product_id : int
+  -product_name : varchar(255)
+  -product_brand : varchar(120)
+  -product_image_url : varchar
+  -unit_price : decimal(12,2)
+  -quantity : int
+}
+
+class "orders_ordershipping" as OrderShipping {
+  <<ORM Persistable>>
+  -ID : bigint
+  -order_id : bigint
+  -recipient_name : varchar(120)
+  -phone : varchar(40)
+  -address_line : varchar(255)
+  -city_or_region : varchar(120)
+  -postal_code : varchar(40)
+  -country : varchar(120)
+  -note : text
+}
+
+' ============================================================
+' PAYMENT SERVICE - payment_db - PostgreSQL
+' ============================================================
+class "payments_payment" as Payment {
+  <<ORM Persistable>>
+  -ID : bigint
+  -order_id : int
+  -user_id : int
+  -amount : decimal(12,2)
+  -status : varchar(20)
+  -paid_at : datetime
+  -created_at : datetime
+  -updated_at : datetime
+}
+
+' ============================================================
+' SHIPPING SERVICE - shipping_db - PostgreSQL
+' ============================================================
+class "shipments_shipment" as Shipment {
+  <<ORM Persistable>>
+  -ID : bigint
+  -order_id : int
+  -user_id : int
+  -recipient_name : varchar(120)
+  -phone : varchar(40)
+  -address_line : varchar(255)
+  -city_or_region : varchar(120)
+  -postal_code : varchar(40)
+  -country : varchar(120)
+  -note : text
+  -status : varchar(20)
+  -created_at : datetime
+  -updated_at : datetime
+}
+
+' ============================================================
+' CHATBOT SERVICE - chatbot_db - PostgreSQL
+' ============================================================
+class "chatbot_behaviorevent" as BehaviorEvent {
+  <<ORM Persistable>>
+  -ID : bigint
+  -user_ref : varchar(120)
+  -event_type : varchar(40)
+  -category_slug : varchar(120)
+  -product_id : int
+  -metadata : json
+  -created_at : datetime
+}
+
+' ============================================================
+' RELATIONSHIPS
+' "--"  : ORM/logical association, no diamond.
+' "*--" : Composition - composite, filled diamond at owning lifecycle root.
+' "o--" : Aggregation - shared, hollow diamond at shared grouping side.
+' Labels mark logical links that are text content, ID references, or copied snapshots, not physical FKs.
+' ============================================================
+
+' --- USER SERVICE ---
+AuthUser "user 1" *-- "0..* legacyMappings" LegacyUserMapping : composite cascade mapping
+AuthUser "user-domain context 0..1" -- "0..* blogPosts" BlogPost : author text non-FK
+AuthUser "user-domain context 0..1" -- "0..* testimonials" Testimonial : testimonial content non-FK
+
+' --- PRODUCT SERVICE ---
+Category "category 1" o-- "0..* products" Product : shared catalog group
+
+' --- ORDER SERVICE ---
+Order "order 1" *-- "0..* items" OrderItem : composite cascade items
+Order "order 1" *-- "0..1 shippingSnapshot" OrderShipping : composite cascade address
+
+' --- CROSS-SERVICE REFERENCES BY ID / SNAPSHOT ---
+AuthUser "user 1" -- "0..* cartItems" CartItem : user_id logical
+AuthUser "user 1" -- "0..* savedItems" SavedItem : user_id logical
+AuthUser "user 1" -- "0..* compareItems" CompareItem : user_id logical
+AuthUser "user 1" -- "0..* orders" Order : user_id logical
+
+CartItem "cartItem 0..*" -- "1 product" Product : product snapshot
+SavedItem "savedItem 0..*" -- "1 product" Product : product snapshot
+CompareItem "compareItem 0..*" -- "1 product" Product : product snapshot
+OrderItem "orderItem 0..*" -- "1 product" Product : product snapshot
+
+Order "order 1" -- "0..1 payment" Payment : order_id logical
+Order "order 1" -- "0..1 shipment" Shipment : order_id logical
+Payment "payment 0..*" -- "1 user" AuthUser : user_id logical
+Shipment "shipment 0..*" -- "1 user" AuthUser : user_id logical
+
+AuthUser "user 1" -- "0..* behaviorEvents" BehaviorEvent : user_ref logical
+BehaviorEvent "event 0..*" -- "0..1 category" Category : category_slug logical
+BehaviorEvent "event 0..*" -- "0..1 product" Product : product_id logical
+
+@enduml

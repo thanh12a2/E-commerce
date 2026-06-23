@@ -1,0 +1,65 @@
+{
+  "version": 3,
+  "generated_at_utc": "2026-04-27T10:12:41.648838+00:00",
+  "categories": [
+    {
+      "slug": "business-laptops",
+      "name": "Business Laptops"
+    },
+    {
+      "slug": "gaming-laptops",
+      "name": "Gaming Laptops"
+    },
+    {
+      "slug": "ultrabooks",
+      "name": "Ultrabooks"
+    },
+    {
+      "slug": "smartphones",
+      "name": "Smartphones"
+    },
+    {
+      "slug": "tablets",
+      "name": "Tablets"
+    },
+    {
+      "slug": "smartwatches",
+      "name": "Smartwatches"
+    },
+    {
+      "slug": "audio",
+      "name": "Audio"
+    },
+    {
+      "slug": "keyboards-mice",
+      "name": "Keyboards & Mice"
+    },
+    {
+      "slug": "chargers-cables",
+      "name": "Chargers & Cables"
+    },
+    {
+      "slug": "bags-stands",
+      "name": "Bags & Stands"
+    }
+  ],
+  "priors": {
+    "business-laptops": 0.0707,
+    "gaming-laptops": 0.069,
+    "ultrabooks": 0.0843,
+    "smartphones": 0.0943,
+    "tablets": 0.1062,
+    "smartwatches": 0.0072,
+    "audio": 0.0825,
+    "keyboards-mice": 0.0678,
+    "chargers-cables": 0.089,
+    "bags-stands": 0.3291
+  },
+  "metrics": {
+    "samples": 1357,
+    "distinct_users": 1357,
+    "total_events": 1357,
+    "category_count": 10,
+    "loss": null
+  }
+}

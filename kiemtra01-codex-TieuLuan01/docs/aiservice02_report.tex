@@ -1,0 +1,872 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[a4paper,margin=2.2cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{pdflscape}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{listings}
+\usepackage[table]{xcolor}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{url}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  urlcolor=blue
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{AI Service Assignment Report}
+\rhead{\thepage}
+\setlength{\headheight}{15pt}
+\setlength{\parskip}{6pt}
+\setlength{\parindent}{0pt}
+\renewcommand{\arraystretch}{1.2}
+\onehalfspacing
+
+\lstdefinestyle{codestyle}{
+  basicstyle=\ttfamily\scriptsize,
+  breaklines=true,
+  breakatwhitespace=false,
+  columns=fullflexible,
+  showstringspaces=false,
+  frame=single,
+  rulecolor=\color{black!20},
+  backgroundcolor=\color{black!2},
+  numbers=left,
+  numberstyle=\tiny\color{black!55},
+  keywordstyle=\color{blue!60!black},
+  commentstyle=\color{green!40!black},
+  stringstyle=\color{red!45!black},
+  tabsize=2
+}
+
+\lstset{style=codestyle,language=Python}
+
+\newcommand{\UniversityName}{[University Name]}
+\newcommand{\FacultyName}{[Faculty / Department]}
+\newcommand{\CourseName}{AI Service}
+\newcommand{\StudentName}{[Student Full Name]}
+\newcommand{\StudentId}{[Student ID]}
+\newcommand{\ClassName}{[Class]}
+\newcommand{\GroupName}{[Group]}
+\newcommand{\InstructorName}{[Instructor Name]}
+
+\begin{document}
+
+\pagenumbering{roman}
+\tableofcontents
+\clearpage
+\pagenumbering{arabic}
+
+\section{Abstract}
+This report presents the design and implementation of an AI service for a Docker-based e-commerce platform composed of six Django application services behind an Nginx gateway. The assignment requires four principal outcomes: the generation of a synthetic behavior dataset named \texttt{data\_user500.csv}, the training and evaluation of three sequence models (\texttt{RNN}, \texttt{LSTM}, and \texttt{biLSTM}), the construction of a Neo4j knowledge graph, and the deployment of a RAG-enabled chatbot integrated into the e-commerce interface. The present report documents these tasks in a structured academic style and uses repository artifacts, code excerpts, metrics, Mermaid diagrams, and screenshots as supporting evidence.
+
+The implemented system forms a coherent end-to-end pipeline rather than a collection of isolated exercises. Synthetic shopping sessions are first generated from the product catalog, then transformed into sequence-learning samples, imported into a graph structure, and finally reused by a hybrid retrieval-and-generation chatbot. The resulting AI functionality is exposed through dashboard recommendations, cart recommendations, and a custom chat widget, thereby satisfying both the analytical and integration-oriented requirements of the assignment brief.
+
+\section{AI Service Description}
+
+\subsection{Assignment Context}
+According to \texttt{baitap\_NOP\_ai\_service\_20.04.2026.pdf}, the submitted report must contain a cover page, a description of the AI service, a copy of 20 rows from the generated dataset, an explanation of Question 2a with code and plots, evidence of the Neo4j knowledge graph, and written documentation with images for Questions 2c and 2d. For that reason, this document follows the same order as the assignment while presenting the material in a more formal and analytical style.
+
+The project is academically meaningful because it combines several distinct AI tasks within one software system: synthetic data generation, sequence classification, graph modeling, retrieval augmentation, and interface-level integration. Rather than solving these tasks independently, the repository reuses the output of each stage in later stages.
+
+\subsection{Assignment Scope}
+This report addresses all requirements stated in the assignment brief:
+\begin{enumerate}[label=\arabic*.]
+  \item Generate a synthetic behavior dataset named \texttt{data\_user500.csv} with 500 users and 8 behaviors.
+  \item Train and compare three sequence models, namely \texttt{RNN}, \texttt{LSTM}, and \texttt{biLSTM}, then select \texttt{model\_best}.
+  \item Build a Neo4j knowledge base graph from the generated behavior dataset.
+  \item Build a RAG-based chatbot on top of the knowledge graph.
+  \item Integrate the AI features into the e-commerce system through product-list suggestions, cart suggestions, and a custom website chat interface.
+\end{enumerate}
+
+The repository already implements the complete pipeline and organizes the system into six Django services plus the Nginx public gateway:
+\begin{itemize}
+  \item \texttt{gateway}: Nginx entrypoint on port \texttt{8080} for public UI and API traffic.
+  \item \texttt{user\_service}: authentication, customer/staff UI, Django session UI auth, JWT API auth, and gateway orchestration.
+  \item \texttt{product\_service}: catalog API with 10 categories and 100 seeded products.
+  \item \texttt{order\_service}: cart, saved items, compare list, checkout orchestration, order ownership, and order snapshots.
+  \item \texttt{payment\_service}: payment records and payment confirmation lifecycle.
+  \item \texttt{shipping\_service}: shipment records and shipping status lifecycle.
+  \item \texttt{chatbot\_service}: synthetic dataset generation, sequence modeling, Neo4j graph integration, file-based retrieval, and chatbot API.
+\end{itemize}
+
+\subsection{End-to-End AI Pipeline}
+The implemented AI workflow can be summarized as follows:
+\begin{enumerate}[label=\arabic*.]
+  \item Generate \texttt{data\_user500.csv} from simulated customer sessions grounded in the live catalog.
+  \item Transform these sessions into supervised sequence-learning samples.
+  \item Train three recurrent models in a Kaggle notebook and export their artifacts.
+  \item Select \texttt{model\_best.keras} using macro F1 as the primary criterion and simplicity as the tie-break rule.
+  \item Import user behaviors into Neo4j as a graph composed of \texttt{User}, \texttt{Behavior}, \texttt{Category}, and \texttt{Product}.
+  \item Combine model inference, graph retrieval, and file-based retrieval in a hybrid RAG chatbot.
+  \item Render AI outputs in the dashboard, the cart page, and a custom floating chat widget.
+\end{enumerate}
+
+This pipeline demonstrates that the project is not a set of disconnected deliverables. Instead, each stage creates artifacts that are consumed by later stages, which gives the submission greater methodological coherence.
+
+\subsection{Service Responsibilities}
+\begin{table}[H]
+\centering
+\caption{Service responsibilities in the implemented system}
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{3cm} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}p{2.3cm}}
+\toprule
+Service & Main responsibility & Port \\
+\midrule
+\texttt{gateway} & Nginx primary public entrypoint for customer UI, staff UI, auth API, catalog API, order API, payment API, shipping API, and chatbot API & \texttt{8080} \\
+\texttt{user\_service} & Customer/staff UI, session auth, JWT auth API, gateway logic, and rendering of AI outputs in dashboard, cart, and chat widget & \texttt{8000}, \texttt{8003} debug \\
+\texttt{product\_service} & Product catalog API, category metadata, and source of products used by recommendation features & \texttt{8001} \\
+\texttt{order\_service} & Cart, compare, saved items, checkout orchestration, orders, payment/shipping snapshots, and analytics & Internal Docker network \\
+\texttt{payment\_service} & Payment transaction records and confirmation lifecycle used by checkout and pay-order flows & Internal Docker network \\
+\texttt{shipping\_service} & Shipment records and staff-managed shipping status transitions & Internal Docker network \\
+\texttt{chatbot\_service} & Dataset generation, behavior modeling, graph retrieval, RAG, and chatbot API & \texttt{8005} \\
+\texttt{neo4j} & Knowledge graph storage and graph-based retrieval support & \texttt{7474}, \texttt{7687} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The public gateway for the implemented system is \texttt{http://localhost:8080/}. Direct service ports such as \texttt{8000}, \texttt{8001}, and \texttt{8005} remain useful for local debugging, but submission screenshots and smoke checks should prefer the gateway route. Authentication is also split by surface: browser-facing customer and staff pages use Django sessions, while API clients use JWT endpoints under \texttt{/api/auth/}.
+
+\subsection{Assignment Compliance Matrix}
+\begin{table}[H]
+\centering
+\caption{Mapping between assignment requirements and report sections}
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{5cm} >{\raggedright\arraybackslash}X}
+\toprule
+Assignment requirement & Where it is addressed in this report \\
+\midrule
+Cover page & Title page at the beginning of the document \\
+Description of the AI service & Section 2: AI Service Description \\
+Copy 20 rows of data & Section 3.5: Twenty Sample Rows \\
+Question 2a explanation, code, and plots & Section 4, including representative code and figures \\
+Knowledge graph evidence and graph image & Section 5, including graph schema, import code, and Neo4j screenshots \\
+Question 2c and 2d documentation with images & Sections 6 and 7, including chatbot and UI evidence \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\clearpage
+\section{Question 1: Generating \texttt{data\_user500.csv}}
+
+\subsection{Objective and Dataset Design}
+The first requirement of the assignment is to generate a dataset named \texttt{data\_user500.csv} containing 500 users and 8 behavior types. In this project, the dataset is not produced by random independent rows. Instead, it is generated through a controlled simulation of customer sessions so that the same data can later support both sequence modeling and graph construction. This is methodologically important because sequence prediction requires temporal consistency, whereas the knowledge graph requires coherent links among users, products, and categories.
+
+The synthetic dataset generator is implemented in:
+\begin{center}
+\texttt{services/chatbot\_service/chatbot/dataset\_generation.py}
+\end{center}
+
+The dataset was designed to simulate realistic customer sessions in an electronics e-commerce system:
+\begin{itemize}
+  \item 500 synthetic users.
+  \item 8 official behavior types:
+  \texttt{search}, \texttt{view\_product}, \texttt{chatbot\_ask}, \texttt{save\_item},
+  \texttt{compare\_item}, \texttt{add\_to\_cart}, \texttt{checkout}, and \texttt{pay\_order}.
+  \item 10 official product categories aligned with the current catalog service.
+  \item Each user owns 4 to 7 sessions.
+  \item Each session follows a realistic flow such as purchase, save, compare, or chatbot inquiry.
+  \item The supervised label is \texttt{target\_next\_category\_slug}, meaning the next category in the behavior sequence.
+\end{itemize}
+
+The dataset is generated through the following command:
+\begin{lstlisting}[language=bash,caption={Command used to generate the 500-user dataset}]
+docker compose exec chatbot_service python manage.py generate_behavior_dataset \
+  --users 500 --sample-size 20 --seed 20260420
+\end{lstlisting}
+
+The fixed random seed strengthens reproducibility. If the experiment is repeated later, the same synthetic dataset can be regenerated for verification and comparison.
+
+\subsection{Dataset Schema}
+\begin{table}[H]
+\centering
+\caption{Columns in \texttt{data\_user500.csv}}
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{3.2cm} >{\raggedright\arraybackslash}X}
+\toprule
+Column & Description \\
+\midrule
+\texttt{user\_ref} & Synthetic user identifier \\
+\texttt{event\_ts} & Event timestamp in ISO UTC format \\
+\texttt{step\_index} & Step index inside a session \\
+\texttt{behavior\_type} & Behavior type \\
+\texttt{category\_slug} & Category of the current event \\
+\texttt{product\_id} & Product identifier, if the event is linked to a product \\
+\texttt{price\_bucket} & Price bucket: \texttt{under\_500}, \texttt{500\_1000}, \texttt{1000\_2000}, \texttt{above\_2000}, \texttt{unknown} \\
+\texttt{device\_type} & Device type: \texttt{desktop}, \texttt{mobile}, \texttt{tablet}, \texttt{unknown} \\
+\texttt{search\_query} & Search phrase or chatbot question \\
+\texttt{session\_id} & Session identifier \\
+\texttt{target\_next\_category\_slug} & Supervised target used for sequence prediction \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Observed Dataset Statistics}
+The following values are taken directly from:
+\begin{center}
+\texttt{services/chatbot\_service/chatbot/artifacts/dataset\_stats.json}
+\end{center}
+
+\begin{table}[H]
+\centering
+\caption{Overall statistics of the generated dataset}
+\begin{tabular}{lr}
+\toprule
+Metric & Value \\
+\midrule
+User count & 500 \\
+Event count & 10,948 \\
+Session count & 2,712 \\
+Supervised row count & 8,236 \\
+Terminal row count & 2,712 \\
+Average events per session & 4.04 \\
+Average sessions per user & 5.42 \\
+Minimum sessions per user & 4 \\
+Maximum sessions per user & 7 \\
+Maximum session length & 6 \\
+Unique product count & 100 \\
+Catalog source & \texttt{product\_service} \\
+Seed & 20260420 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Distribution of the 8 behavior types}
+\begin{tabular}{lr}
+\toprule
+Behavior & Count \\
+\midrule
+\texttt{view\_product} & 3,036 \\
+\texttt{search} & 2,943 \\
+\texttt{add\_to\_cart} & 1,130 \\
+\texttt{checkout} & 1,127 \\
+\texttt{pay\_order} & 1,127 \\
+\texttt{save\_item} & 573 \\
+\texttt{chatbot\_ask} & 547 \\
+\texttt{compare\_item} & 465 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+These statistics indicate that the dataset covers the main stages of the shopping funnel rather than only browsing events. The large number of \texttt{view\_product} and \texttt{search} actions is consistent with realistic exploratory behavior, while the presence of \texttt{checkout} and \texttt{pay\_order} events ensures that the dataset also captures high-intent interactions. This balance is useful because the same data asset is later reused for sequence classification, graph construction, and chatbot retrieval.
+
+\subsection{Twenty Sample Rows}
+The assignment explicitly requests a copy of 20 rows from the generated dataset. The following rows were taken from:
+\begin{center}
+\texttt{services/chatbot\_service/chatbot/artifacts/data\_user500\_sample20.csv}
+\end{center}
+
+\begin{landscape}
+\begin{lstlisting}[language={},caption={20 sample rows copied from the generated dataset},basicstyle=\ttfamily\tiny]
+user_ref,event_ts,step_index,behavior_type,category_slug,product_id,price_bucket,device_type,search_query,session_id,target_next_category_slug
+user_0001,2026-01-09T03:48:00Z,1,search,ultrabooks,0,unknown,mobile,ultrabook for consulting work,user_0001_sess_01,ultrabooks
+user_0028,2026-02-06T09:05:06Z,2,view_product,smartphones,36,1000_2000,mobile,,user_0028_sess_02,smartphones
+user_0053,2026-03-10T13:05:00Z,1,search,bags-stands,0,unknown,mobile,MOFT stand for daily commute,user_0053_sess_07,bags-stands
+user_0079,2026-03-01T03:10:37Z,4,checkout,bags-stands,94,under_500,desktop,,user_0079_sess_05,bags-stands
+user_0104,2026-02-04T15:46:00Z,3,compare_item,keyboards-mice,79,under_500,desktop,,user_0104_sess_02,
+user_0130,2026-02-13T15:24:45Z,4,chatbot_ask,bags-stands,95,under_500,unknown,Is LiftStand Fold a good pick for ergonomic desk?,user_0130_sess_05,
+user_0158,2026-02-18T07:15:32Z,3,view_product,smartwatches,57,500_1000,unknown,,user_0158_sess_04,smartwatches
+user_0183,2026-02-02T20:12:23Z,2,view_product,business-laptops,3,1000_2000,desktop,,user_0183_sess_03,business-laptops
+user_0207,2026-02-06T19:07:07Z,3,add_to_cart,business-laptops,6,1000_2000,desktop,,user_0207_sess_04,business-laptops
+user_0232,2026-02-02T23:37:34Z,3,add_to_cart,business-laptops,5,1000_2000,desktop,,user_0232_sess_04,business-laptops
+user_0257,2026-02-07T12:58:00Z,1,search,smartphones,0,unknown,desktop,iphone for travel photos,user_0257_sess_07,smartphones
+user_0283,2026-02-07T15:25:00Z,1,search,tablets,0,unknown,tablet,best may tinh bang mid range,user_0283_sess_06,tablets
+user_0311,2026-02-04T11:51:00Z,1,search,smartphones,0,unknown,mobile,android for creator content,user_0311_sess_05,smartphones
+user_0337,2026-01-10T23:23:53Z,5,pay_order,chargers-cables,83,under_500,mobile,,user_0337_sess_01,
+user_0363,2026-03-02T16:35:41Z,4,save_item,smartphones,32,1000_2000,desktop,,user_0363_sess_04,
+user_0391,2026-02-15T08:51:00Z,1,search,bags-stands,0,unknown,desktop,best gia do under 500,user_0391_sess_02,bags-stands
+user_0421,2026-01-16T21:46:00Z,1,search,tablets,0,unknown,tablet,Xiaomi ipad for portable drawing,user_0421_sess_03,tablets
+user_0448,2026-02-16T15:22:22Z,2,view_product,ultrabooks,24,1000_2000,desktop,,user_0448_sess_02,ultrabooks
+user_0474,2026-02-22T23:41:50Z,4,checkout,bags-stands,96,under_500,tablet,,user_0474_sess_04,bags-stands
+user_0500,2026-02-27T09:48:00Z,4,chatbot_ask,tablets,49,1000_2000,tablet,Would Surface Pro Flex work well for portable drawing and travel?,user_0500_sess_07,
+\end{lstlisting}
+\end{landscape}
+
+The sample rows demonstrate variation in device type, category, interaction intent, and session progression. Such diversity is desirable because it reduces the risk that later models learn only one narrow behavioral pattern.
+
+\subsection{Representative Dataset Generation Code}
+\begin{lstlisting}[caption={Representative code for synthetic user-profile generation}]
+def _build_user_profiles(user_count, categories, rng):
+    all_slugs = [item["slug"] for item in categories]
+    profiles = []
+    for user_index in range(1, user_count + 1):
+        primary_slug = _weighted_choice(rng, CATEGORY_POPULARITY)
+        related = [slug for slug in RELATED_CATEGORY_MAP.get(primary_slug, []) if slug != primary_slug]
+        secondary_slug = related[0] if related else rng.choice([slug for slug in all_slugs if slug != primary_slug])
+        tertiary_candidates = [slug for slug in all_slugs if slug not in {primary_slug, secondary_slug}]
+        tertiary_slug = rng.choice(tertiary_candidates)
+        session_count = rng.randint(4, 7)
+        profiles.append(
+            {
+                "user_ref": f"user_{user_index:04d}",
+                "session_count": session_count,
+                "primary_slug": primary_slug,
+                "secondary_slug": secondary_slug,
+                "tertiary_slug": tertiary_slug,
+            }
+        )
+    return profiles
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Representative code for session-flow generation}]
+def _session_rows(...):
+    rows = []
+    add_event("search", session_category, None, search_query)
+
+    if rng.random() < 0.08:
+        add_event("search", session_category, None, refined_query)
+
+    add_event("view_product", primary_product.category_slug, primary_product)
+
+    if flow_type == "purchase":
+        add_event("add_to_cart", primary_product.category_slug, primary_product)
+        add_event("checkout", primary_order_product.category_slug, primary_order_product)
+        add_event("pay_order", primary_order_product.category_slug, primary_order_product)
+    elif flow_type == "save":
+        add_event("save_item", primary_product.category_slug, primary_product)
+    elif flow_type == "compare":
+        add_event("compare_item", secondary_product.category_slug, secondary_product)
+    else:
+        add_event("chatbot_ask", primary_product.category_slug, primary_product, chatbot_message)
+
+    return _finalize_targets(rows)
+\end{lstlisting}
+
+The first excerpt shows that each user is assigned persistent interest categories, which helps preserve behavioral continuity across sessions. The second excerpt shows that session events are generated according to intent-specific flows such as purchase, save, compare, or chatbot inquiry. Consequently, the dataset is sequentially structured rather than merely synthetic in appearance.
+
+\clearpage
+\section{Question 2a: Building RNN, LSTM, and biLSTM Models}
+
+\subsection{Problem Formulation}
+The training pipeline for Question 2a is implemented in the Kaggle notebook:
+\begin{center}
+\texttt{notebooks/phase3\_kaggle\_training\_2a.ipynb}
+\end{center}
+
+The supervised learning task is defined as follows:
+\begin{itemize}
+  \item \textbf{Input sequence length}: 5 behavior steps.
+  \item \textbf{Per-step features}: \texttt{behavior\_type}, \texttt{category\_slug}, \texttt{price\_bucket}, and \texttt{device\_type}.
+  \item \textbf{Target}: \texttt{target\_next\_category\_slug}.
+  \item \textbf{Split policy}: group split by \texttt{user\_ref + session\_id} to avoid leakage across events from the same session.
+  \item \textbf{Label set}: the 10 official category slugs used by the catalog service.
+  \item \textbf{Selection rule}: maximize macro F1, then use model simplicity as a tie-break when the difference is small.
+\end{itemize}
+
+This formulation is academically reasonable because the assignment asks for sequence models, and next-category prediction provides a concrete way to learn from ordered behavior traces. The output is also operationally useful for later recommendation and retrieval stages.
+
+\subsection{Model Architecture}
+All three models share the same feature encoding pipeline and differ only in the recurrent backbone:
+\begin{itemize}
+  \item \texttt{RNN}: \texttt{SimpleRNN(64)}
+  \item \texttt{LSTM}: \texttt{LSTM(64)}
+  \item \texttt{biLSTM}: \texttt{Bidirectional(LSTM(64))}
+\end{itemize}
+
+\begin{lstlisting}[caption={Core backbone selection code in the training notebook}]
+def recurrent_backbone(backbone_name):
+    if backbone_name == "rnn":
+        return tf.keras.layers.SimpleRNN(64, dropout=0.20, name="recurrent")
+    if backbone_name == "lstm":
+        return tf.keras.layers.LSTM(64, dropout=0.20, name="recurrent")
+    if backbone_name == "bilstm":
+        return tf.keras.layers.Bidirectional(
+            tf.keras.layers.LSTM(64, dropout=0.20),
+            name="recurrent",
+        )
+    raise ValueError(f"Unsupported backbone: {backbone_name}")
+\end{lstlisting}
+
+\subsection{Evaluation Results}
+The following comparison table is copied from:
+\begin{center}
+\texttt{services/chatbot\_service/chatbot/artifacts/metrics\_comparison.csv}
+\end{center}
+
+\begin{table}[H]
+\centering
+\caption{Comparison of the three sequence models}
+\begin{tabular}{lrrrrrrr}
+\toprule
+Model & Accuracy & Macro P & Macro R & Macro F1 & Params & Best val acc & Time (s) \\
+\midrule
+RNN & 0.999201 & 0.999587 & 0.999237 & 0.999410 & 11,192 & 0.996697 & 11.01 \\
+LSTM & 0.999201 & 0.999587 & 0.999237 & 0.999410 & 29,432 & 0.996697 & 6.79 \\
+biLSTM & 0.999201 & 0.999587 & 0.999237 & 0.999410 & 57,848 & 0.997523 & 7.13 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The results show that all three recurrent models achieved almost identical predictive performance on the current synthetic dataset. The shared macro F1 score of \texttt{0.999410} suggests that the learning problem is highly structured and relatively easy under the present data-generation regime. This should be interpreted carefully: the metrics confirm internal consistency, but they do not necessarily imply that the same performance would transfer to noisier real-world user logs.
+
+\subsection{Why \texttt{model\_best} Is RNN}
+According to:
+\begin{center}
+\texttt{services/chatbot\_service/chatbot/artifacts/model\_best\_reason.txt}
+\end{center}
+the selected best model is \texttt{RNN}. The reasoning is:
+\begin{itemize}
+  \item All three models achieved the same macro F1 score, namely \texttt{0.999410}.
+  \item The project uses macro F1 as the primary criterion.
+  \item When multiple models remain inside the tie tolerance threshold, the project prefers the smaller and simpler model for runtime inference.
+  \item RNN is the lightest among the three candidates, with only \texttt{11,192} parameters.
+\end{itemize}
+
+Therefore, the final choice is justified by both predictive quality and practical deployment considerations. The report does not claim that a simple RNN is universally superior to LSTM or biLSTM. Rather, it argues that under the measured results of this specific dataset, the RNN model is the most efficient model among those with equivalent macro F1 performance.
+
+\begin{lstlisting}[caption={Code used to select \texttt{model\_best}}]
+max_macro_f1 = metrics_df["macro_f1"].max()
+best_candidates = metrics_df[
+    metrics_df["macro_f1"] >= (max_macro_f1 - BEST_TIE_TOLERANCE)
+].copy()
+best_candidates["simplicity_rank"] = best_candidates["model_name"].map(MODEL_SIMPLICITY_RANK)
+best_row = best_candidates.sort_values(
+    ["params", "simplicity_rank", "model_name"],
+    ascending=[True, True, True],
+).iloc[0]
+
+best_model_name = best_row["model_name"]
+shutil.copy2(OUTPUT_DIR / MODEL_OUTPUT_FILENAMES[best_model_name], OUTPUT_DIR / "model_best.keras")
+\end{lstlisting}
+
+\subsection{Visualization}
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{Image/confusion_matrix_rnn.png}
+    \caption{Confusion matrix of the selected model}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{Image/history_rnn.png}
+    \caption{Training history of the selected model}
+  \end{subfigure}
+  \caption{Visualization used to evaluate \texttt{model\_best}}
+\end{figure}
+
+The confusion matrix provides class-level evidence that the model predicts category transitions accurately across the full label set, while the training-history figure shows stable convergence during optimization. These visualizations are particularly important because the assignment requires not only numerical evaluation but also graphical evidence.
+
+\subsection{Runtime Use of the Best Model}
+The project does not stop at offline training. The exported \texttt{model\_best.keras} is integrated into the chatbot runtime. Inside \texttt{behavior\_ai.py}, model-based category probabilities are combined with heuristic scores so that the chatbot can estimate the user's dominant category before retrieval and recommendation ranking. This design is practically valuable because it improves personalization while still preserving a safe fallback path when contextual information is incomplete.
+
+\clearpage
+\section{Question 2b: Building the Neo4j Knowledge Base Graph}
+
+\subsection{Objective and Graph Structure}
+Question 2b requires the construction of a knowledge base graph in Neo4j using the generated behavior dataset. The graph layer is intended to represent behavioral evidence in relational form so that later components can retrieve preference-oriented context rather than rely solely on flat tabular data.
+
+The knowledge graph is implemented in:
+\begin{center}
+\texttt{services/chatbot\_service/chatbot/behavior\_graph.py}
+\end{center}
+
+The imported graph contains four main node types:
+\begin{itemize}
+  \item \texttt{User}
+  \item \texttt{Behavior}
+  \item \texttt{Category}
+  \item \texttt{Product}
+\end{itemize}
+
+The main relationships are:
+\begin{itemize}
+  \item \texttt{(User)-[:PERFORMED]->(Behavior)}
+  \item \texttt{(Behavior)-[:IN\_CATEGORY]->(Category)}
+  \item \texttt{(Behavior)-[:ON\_PRODUCT]->(Product)}
+  \item \texttt{(Product)-[:BELONGS\_TO]->(Category)}
+  \item \texttt{(User)-[:PREFERS]->(Category)}
+\end{itemize}
+
+The graph is imported through:
+\begin{lstlisting}[language=bash,caption={Command used to import the behavior graph}]
+docker compose exec chatbot_service python manage.py import_behavior_graph --reset
+\end{lstlisting}
+
+This schema is appropriate for the assignment because it captures both direct observations and inferred preference relationships. Consequently, the graph becomes more informative than a simple copy of the CSV file.
+
+\subsection{Affinity Rule for \texttt{PREFERS}}
+To construct user-category preference edges, each behavior type receives an affinity weight:
+
+\begin{table}[H]
+\centering
+\caption{Behavior affinity weights used for preference inference}
+\begin{tabular}{lr}
+\toprule
+Behavior & Weight \\
+\midrule
+\texttt{search} & 1.0 \\
+\texttt{view\_product} & 1.6 \\
+\texttt{chatbot\_ask} & 2.4 \\
+\texttt{save\_item} & 3.0 \\
+\texttt{compare\_item} & 3.2 \\
+\texttt{add\_to\_cart} & 4.2 \\
+\texttt{checkout} & 5.1 \\
+\texttt{pay\_order} & 6.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+This means the graph stores not only raw user actions, but also a weighted signal of category preference intensity. From an interpretability perspective, this is useful because higher-intent actions such as \texttt{pay\_order} contribute more strongly to a user's inferred affinity than lower-intent actions such as \texttt{search}.
+
+\subsection{Representative Graph Construction Code}
+\begin{lstlisting}[caption={Representative code for graph payload construction}]
+def build_behavior_graph_payload(...):
+    dataset_rows = _load_dataset_rows(dataset_path)
+    categories = category_items(fetch_catalog_categories(), extra_slugs=dataset_slugs)
+    product_lookup, product_rows, catalog_source = _product_rows_for_lookup()
+
+    user_scores = defaultdict(lambda: defaultdict(Decimal))
+    user_category_events = defaultdict(Counter)
+    behavior_rows = []
+
+    for row in dataset_rows:
+        category_slug = row["category_slug"]
+        affinity_weight = BEHAVIOR_AFFINITY_WEIGHTS.get(row["behavior_type"], Decimal("1.0"))
+        product = product_lookup.get(row["product_id"], {})
+
+        user_scores[row["user_ref"]][category_slug] += affinity_weight
+        user_category_events[row["user_ref"]][category_slug] += 1
+
+        behavior_rows.append(
+            {
+                **row,
+                "affinity_weight": _float_value(affinity_weight),
+                "product_name": product.get("name", ""),
+                "product_brand": product.get("brand", ""),
+            }
+        )
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Representative Cypher import logic}]
+BEHAVIOR_IMPORT_QUERY = """
+UNWIND $rows AS row
+MATCH (u:User {user_ref: row.user_ref})
+MATCH (c:Category {slug: row.category_slug})
+MERGE (b:Behavior {behavior_id: row.behavior_id})
+SET b.behavior_type = row.behavior_type,
+    b.event_ts = row.event_ts,
+    b.session_id = row.session_id,
+    b.affinity_weight = row.affinity_weight
+MERGE (u)-[:PERFORMED]->(b)
+MERGE (b)-[:IN_CATEGORY]->(c)
+FOREACH (_ IN CASE WHEN row.product_id > 0 THEN [1] ELSE [] END |
+    MERGE (p:Product {product_id: row.product_id})
+    MERGE (b)-[:ON_PRODUCT]->(p)
+)
+"""
+\end{lstlisting}
+
+These excerpts show that the graph-construction stage enriches behavior rows with affinity values and product metadata before import. In other words, the graph is not merely a visualization artifact; it is a structured representation designed for subsequent retrieval.
+
+\subsection{Graph Evidence}
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{Image/neo4j-browser.png}
+    \caption{Neo4j Browser overview after importing the behavior graph}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{Image/neo4j-browser-2.png}
+    \caption{Additional Neo4j Browser evidence of the imported graph}
+  \end{subfigure}
+  \caption{Neo4j Browser screenshots captured after importing the behavior graph}
+\end{figure}
+
+The screenshots provide the visual evidence required by the assignment and demonstrate that the graph contains multiple connected entity types rather than a trivial structure. This graph is later reused by the chatbot as a retrieval layer that provides recent behavior traces, category preference signals, and graph-linked product candidates.
+
+\clearpage
+\section{Question 2c: Building RAG and Chat on Top of the Knowledge Graph}
+
+\subsection{Objective and Hybrid Retrieval Design}
+Question 2c asks for a RAG-based chat system built on top of the knowledge graph. In this project, the chatbot is implemented as a hybrid retrieval-and-generation pipeline with four layers:
+\begin{enumerate}[label=\arabic*.]
+  \item \textbf{Behavior signal}: infer the user's dominant category by combining \texttt{model\_best} and heuristic features.
+  \item \textbf{Graph retrieval}: query Neo4j for preference edges, recent behaviors, and graph-related products.
+  \item \textbf{File-based RAG}: retrieve supporting context from \texttt{knowledge\_base.json}.
+  \item \textbf{Recommendation ranking and answer generation}: score products, assemble a prompt, call the LLM, and fall back to rule-based output when necessary.
+\end{enumerate}
+
+This design is useful because the graph contributes structured preference signals while the file-based knowledge base contributes descriptive product content. As a result, the response is grounded in retrieved evidence instead of relying solely on free-form generation.
+
+\subsection{Core RAG + Graph Pipeline Code}
+\begin{lstlisting}[caption={Core chatbot response pipeline}]
+def generate_chatbot_response(question, current_product=None, user_context=None, user_ref="", limit=5):
+    current_product = current_product or {}
+    user_context = user_context or {}
+
+    record_behavior_event(user_ref=user_ref, message=question, current_product=current_product, user_context=user_context)
+    behavior_signal = predict_behavior_for_user_ref(
+        user_ref=user_ref,
+        question=question,
+        current_product=current_product,
+        user_context=user_context,
+    )
+    preferred_categories = _preferred_categories(question, current_product=current_product, behavior_signal=behavior_signal)
+
+    graph_retriever = BehaviorGraphRetriever()
+    try:
+        graph_context = graph_retriever.fetch_context(
+            user_ref=user_ref,
+            category_slug=behavior_signal.get("dominant_category_slug") or (preferred_categories[0] if preferred_categories else ""),
+            current_product_id=_to_int(current_product.get("id"), 0),
+            limit=6,
+        )
+    finally:
+        graph_retriever.close()
+
+    recommendations = recommend_products(
+        question,
+        current_product=current_product,
+        behavior_signal=behavior_signal,
+        limit=limit,
+        boosted_product_ids=graph_context.get("product_ids") or [],
+    )
+    rag_docs = retrieve_rag_context(
+        question=question,
+        preferred_categories=preferred_categories,
+        current_product=current_product,
+        top_k=6,
+    )
+\end{lstlisting}
+
+\subsection{How the Chatbot Produces an Answer}
+\begin{itemize}
+  \item \texttt{record\_behavior\_event(...)} stores new user interaction signals.
+  \item \texttt{predict\_behavior\_for\_user\_ref(...)} estimates the dominant category using \texttt{model\_best}.
+  \item \texttt{BehaviorGraphRetriever.fetch\_context(...)} collects graph-level context.
+  \item \texttt{retrieve\_rag\_context(...)} retrieves supporting documents from the file-based knowledge base.
+  \item The system merges these contexts, ranks products, and builds a prompt for the active LLM.
+  \item If the LLM is unavailable or produces an empty answer, the system returns a rule-based fallback response so that the UI remains stable.
+\end{itemize}
+
+This sequence demonstrates that the chatbot is grounded in multiple evidence sources and therefore satisfies the assignment requirement more convincingly than a generic chat interface detached from user behavior.
+
+\subsection{Custom Chat Interface}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.82\linewidth]{Image/chat-widget.png}
+  \caption{Custom floating website chat widget used for the AI chatbot}
+\end{figure}
+
+The assignment explicitly requires a custom chat interface rather than a standard ChatGPT-like screen. The repository satisfies this requirement through a floating chat widget embedded directly in the customer UI. The widget sends requests to \texttt{/customer/chatbot/reply/} and keeps the interaction inside the original shopping experience. From a usability perspective, this design is preferable because users can continue browsing products while asking the assistant for guidance.
+
+\clearpage
+\section{Question 2d: E-commerce Integration}
+
+\subsection{Integration Goal}
+The assignment asks for AI output to be integrated into the e-commerce system in at least two places:
+\begin{itemize}
+  \item product lists when the customer searches or interacts with the cart,
+  \item the user chat interface.
+\end{itemize}
+
+The current repository integrates AI into three user-facing locations:
+\begin{enumerate}[label=\arabic*.]
+  \item \textbf{Dashboard search page}: an AI suggestion block appears above product results.
+  \item \textbf{Cart page}: an AI block suggests complementary products for the current basket.
+  \item \textbf{Floating chat widget}: a custom chatbot interface remains available across the customer UI.
+\end{enumerate}
+
+\subsection{Gateway Integration in \texttt{user\_service}}
+\begin{lstlisting}[caption={Gateway call from \texttt{user\_service} to \texttt{chatbot\_service}}]
+def request_chatbot_reply(question, current_product=None, user_context=None, user_ref="", limit=5):
+    payload = {
+        "message": (question or "").strip(),
+        "current_product": sanitized_product,
+        "user_context": user_context or {},
+        "user_ref": str(user_ref or "").strip(),
+        "limit": max(1, int(limit or 5)),
+    }
+    response = requests.post(endpoint, json=payload, timeout=timeout_seconds)
+    data = response.json() if response.content else {}
+    return {
+        "answer": data.get("answer") or "No response generated.",
+        "recommendations": data.get("recommendations") or [],
+        "citations": data.get("citations") or [],
+        "source": data.get("source") or "chatbot_service",
+    }
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Dashboard and cart AI suggestion builders}]
+def build_dashboard_ai_suggestions(user_id, filters, products, user_context=None, limit=4):
+    current_product = products[0] if products else None
+    result = request_chatbot_reply(
+        question=_dashboard_ai_question(filters or {}, products),
+        current_product=current_product,
+        user_context=user_context or build_user_context_payload(user_id),
+        user_ref=str(user_id),
+        limit=limit,
+    )
+
+def build_cart_ai_suggestions(user_id, cart_items, user_context=None, limit=4):
+    result = request_chatbot_reply(
+        question=_cart_ai_question(cart_items),
+        current_product=_current_product_from_cart_item(cart_items[0]),
+        user_context=user_context or build_user_context_payload(user_id, cart_items=cart_items),
+        user_ref=str(user_id),
+        limit=limit,
+    )
+\end{lstlisting}
+
+These excerpts show that the AI layer is integrated through explicit service calls rather than by embedding AI logic directly into the presentation layer. This preserves a cleaner architecture and makes the integration easier to maintain.
+
+\subsection{UI Evidence}
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{Image/dashboard-ai.png}
+    \caption{AI suggestions on the customer dashboard/search page}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{Image/cart-ai.png}
+    \caption{AI complementary recommendations on the cart page}
+  \end{subfigure}
+  \caption{Two AI integration points inside the e-commerce UI}
+\end{figure}
+
+\subsection{Integration Discussion}
+The integration respects the intended service boundaries:
+\begin{itemize}
+  \item \texttt{user\_service} remains responsible for UI and request orchestration.
+  \item \texttt{chatbot\_service} remains responsible for AI logic, including inference, graph retrieval, RAG, recommendation ranking, and final answer generation.
+  \item Existing customer routes such as \texttt{/customer/dashboard/}, \texttt{/customer/cart/}, and \texttt{/customer/chatbot/reply/} remain stable.
+\end{itemize}
+
+This is important because the assignment is not only about implementing AI logic, but also about integrating it without breaking the original e-commerce workflow. In this respect, the solution can be regarded as both functionally complete and architecturally disciplined.
+
+\clearpage
+\section{Conclusion}
+
+\subsection{Summary of Achievements}
+The repository currently satisfies all core requirements of the assignment:
+\begin{enumerate}[label=\arabic*.]
+  \item It generates \texttt{data\_user500.csv} for 500 users and 8 behavior types.
+  \item It trains and compares \texttt{RNN}, \texttt{LSTM}, and \texttt{biLSTM}, then exports \texttt{model\_best.keras}.
+  \item It builds a Neo4j knowledge graph from the behavior dataset.
+  \item It implements a hybrid RAG chatbot on top of graph and file-based retrieval.
+  \item It integrates AI recommendations directly into the e-commerce dashboard, cart, and website chat widget.
+  \item It exposes the system through Nginx on port \texttt{8080}, keeps JWT API auth alongside session UI auth, and separates payment and shipping into dedicated internal services.
+\end{enumerate}
+
+\subsection{Strengths of the Proposed Solution}
+\begin{itemize}
+  \item The solution is end-to-end rather than isolated by phase.
+  \item The same dataset supports classification, graph construction, and retrieval.
+  \item The architecture keeps clear service ownership between UI/auth, catalog, orders, payments, shipping, and AI.
+  \item The repository already contains the required submission evidence: Mermaid diagrams, sample data, metric table, plots, graph artifacts, Neo4j screenshots, and UI screenshots.
+  \item The chatbot includes fallback behavior so the website remains usable even when optional dependencies fail.
+\end{itemize}
+
+\subsection{Limitations and Future Improvements}
+\begin{itemize}
+  \item The dataset is synthetic, so it still differs from noisy real-world customer behavior.
+  \item The three models achieved nearly identical performance, which suggests that a harder dataset would be needed to highlight their differences more clearly.
+  \item The graph retrieval layer currently focuses on category affinity and linked products; it could be expanded with stronger co-purchase or time-decay signals.
+  \item Online evaluation metrics such as click-through rate or conversion uplift could be added in future work.
+\end{itemize}
+
+From an academic perspective, the strongest aspect of the project is the continuity between stages. The dataset generated in Question 1 is later reused for Question 2a and Question 2b, while the outputs of the model and the graph are reused again in Question 2c and Question 2d. This reuse of artifacts gives the overall submission more coherence than a set of disconnected weekly tasks.
+
+\clearpage
+\appendix
+\section{Appendix A: Main Artifacts Used in This Report}
+
+\begin{table}[H]
+\centering
+\caption{Main repository artifacts used as evidence}
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{4cm} >{\raggedright\arraybackslash}X}
+\toprule
+Evidence type & Repository path \\
+\midrule
+Full dataset & \texttt{services/chatbot\_service/chatbot/artifacts/data\_user500.csv} \\
+20-row sample & \texttt{services/chatbot\_service/chatbot/artifacts/data\_user500\_sample20.csv} \\
+Dataset statistics & \texttt{services/chatbot\_service/chatbot/artifacts/dataset\_stats.json} \\
+Model comparison table & \texttt{services/chatbot\_service/chatbot/artifacts/metrics\_comparison.csv} \\
+Best-model explanation & \texttt{services/chatbot\_service/chatbot/artifacts/model\_best\_reason.txt} \\
+Best model file & \texttt{services/chatbot\_service/chatbot/artifacts/model\_best.keras} \\
+RAG knowledge base & \texttt{services/chatbot\_service/chatbot/artifacts/knowledge\_base.json} \\
+Runtime AI config & \texttt{services/chatbot\_service/chatbot/artifacts/runtime\_config.json} \\
+Confusion matrix & \texttt{services/chatbot\_service/chatbot/artifacts/confusion\_matrix\_rnn.png} \\
+Training history plot & \texttt{services/chatbot\_service/chatbot/artifacts/history\_rnn.png} \\
+Mermaid architecture diagrams & \texttt{docs/mermaid-diagrams-v1.md} \\
+Neo4j screenshot & \texttt{docs/evidence/screenshots/neo4j-browser.png} \\
+Neo4j screenshot (2) & \texttt{docs/evidence/screenshots/neo4j-browser-2.png} \\
+Neo4j graph SVG & \texttt{services/chatbot\_service/chatbot/artifacts/behavior\_graph\_demo.svg} \\
+Dashboard AI screenshot & \texttt{docs/evidence/screenshots/dashboard-ai.png} \\
+Cart AI screenshot & \texttt{docs/evidence/screenshots/cart-ai.png} \\
+Chat widget screenshot & \texttt{docs/evidence/screenshots/chat-widget.png} \\
+Gateway screenshot & \texttt{docs/evidence/screenshots/gateway-8080.png} \\
+Training notebook & \texttt{notebooks/phase3\_kaggle\_training\_2a.ipynb} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Appendix B: Main Code Files Referenced}
+
+\begin{itemize}
+  \item \texttt{services/chatbot\_service/chatbot/dataset\_generation.py}
+  \item \texttt{services/chatbot\_service/chatbot/behavior\_ai.py}
+  \item \texttt{services/chatbot\_service/chatbot/behavior\_graph.py}
+  \item \texttt{services/chatbot\_service/chatbot/rag\_kb.py}
+  \item \texttt{services/chatbot\_service/chatbot/services.py}
+  \item \texttt{services/chatbot\_service/chatbot/views.py}
+  \item \texttt{services/user\_service/customer/services.py}
+  \item \texttt{services/user\_service/customer/views.py}
+  \item \texttt{services/user\_service/customer/api\_auth.py}
+  \item \texttt{services/order\_service/orders/service\_clients.py}
+  \item \texttt{services/payment\_service/payments/views.py}
+  \item \texttt{services/shipping\_service/shipments/views.py}
+  \item \texttt{services/user\_service/templates/customer/dashboard.html}
+  \item \texttt{services/user\_service/templates/customer/cart.html}
+  \item \texttt{services/user\_service/templates/partials/chat\_widget.html}
+\end{itemize}
+
+\section{Appendix C: Overleaf Image Upload List}
+Upload the following files into the \texttt{Image/} folder in Overleaf:
+\begin{itemize}
+  \item \texttt{confusion\_matrix\_rnn.png}
+  \item \texttt{history\_rnn.png}
+  \item \texttt{neo4j-browser.png}
+  \item \texttt{neo4j-browser-2.png}
+  \item \texttt{gateway-8080.png}
+  \item \texttt{dashboard-ai.png}
+  \item \texttt{cart-ai.png}
+  \item \texttt{chat-widget.png}
+\end{itemize}
+
+\section{Appendix D: Notes for Overleaf}
+This file is intended for compilation with \texttt{pdfLaTeX}. The package set has been kept compatible with a standard Overleaf workflow and does not depend on \texttt{fontspec}.
+
+If you upload this file to Overleaf, the simplest choice is:
+\begin{enumerate}[label=\arabic*.]
+  \item Set the compiler to \texttt{pdfLaTeX}.
+  \item Upload this file.
+  \item Create an \texttt{Image/} folder.
+  \item Upload the seven PNG files listed above into that folder.
+\end{enumerate}
+
+\end{document}

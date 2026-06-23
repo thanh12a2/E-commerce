@@ -1,0 +1,136 @@
+{% extends 'staff/base.html' %}
+{% block title %}Customer Management{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <h1>Customer Management</h1>
+    <p class="subtitle">Track customer activity, spending patterns, and manage accounts.</p>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="time-filter-row">
+  <span style="font-size:11px;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.5px;">Range:</span>
+  {% for days in time_ranges %}
+  <a href="/staff/customers/?range={{ days }}{% if customer_query %}&q={{ customer_query }}{% endif %}" class="time-filter-chip {% if selected_range_days == days %}active{% endif %}" id="customer-range-{{ days }}">{{ days }}d</a>
+  {% endfor %}
+  <span class="time-filter-note">{{ range_start }} → {{ range_end }}</span>
+</div>
+
+<div class="order-stats-grid" style="margin-bottom:20px;">
+  <div class="stats-card"><p class="stats-label">Total Customers</p><p class="stats-value">{{ customer_count }}</p></div>
+  <div class="stats-card"><p class="stats-label">Active Customers</p><p class="stats-value green">{{ active_customers }}</p></div>
+  <div class="stats-card"><p class="stats-label">Total Orders</p><p class="stats-value">{{ order_stats.total_orders }}</p></div>
+  <div class="stats-card"><p class="stats-label">Paid Revenue</p><p class="stats-value green">${{ order_stats.total_revenue }}</p></div>
+  <div class="stats-card"><p class="stats-label">Units Sold</p><p class="stats-value">{{ order_stats.total_units_sold }}</p></div>
+  <div class="stats-card"><p class="stats-label">Avg Paid Order</p><p class="stats-value">${{ order_stats.average_paid_order_value }}</p></div>
+</div>
+
+<div class="customers-layout" style="display:grid;grid-template-columns:1.4fr 1fr;gap:16px;align-items:start;">
+
+  <!-- Left: Customer Ranking Table -->
+  <div class="panel">
+    <div class="panel-header">
+      <div>
+        <h2>Customer Purchase Ranking</h2>
+        <p class="panel-subtitle">Ranked by total spend in the selected period.</p>
+      </div>
+    </div>
+
+    <form method="get" class="customer-search-form" id="customer-search-form">
+      <input type="hidden" name="range" value="{{ selected_range_days }}">
+      <input id="customer-search-input" name="q" type="text" value="{{ customer_query }}" placeholder="Search by username or email…">
+      <button type="submit" class="table-btn primary" id="customer-search-btn">Search</button>
+      {% if customer_query %}<a class="table-btn" href="/staff/customers/?range={{ selected_range_days }}" id="customer-search-clear">✕ Clear</a>{% endif %}
+    </form>
+
+    {% if customer_rows_page and customer_rows_page.object_list %}
+    <p style="font-size:12px;color:var(--dim);margin-bottom:10px;">{{ filtered_customer_count }} result{{ filtered_customer_count|pluralize }}</p>
+    <div class="table-scroll-wrap">
+      <table class="staff-items-table compact-table">
+        <thead>
+          <tr>
+            <th>Customer</th>
+            <th>Orders</th>
+            <th>Paid</th>
+            <th>Units</th>
+            <th>Spent</th>
+            <th>Last Order</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for customer in customer_rows_page.object_list %}
+          <tr>
+            <td>
+              <strong style="font-size:13px;">{{ customer.display_name|default:customer.username }}</strong><br>
+              <small style="color:var(--dim);">@{{ customer.username }}</small>
+            </td>
+            <td>{{ customer.order_count }}</td>
+            <td>{{ customer.paid_order_count }}</td>
+            <td>{{ customer.total_units }}</td>
+            <td style="color:var(--accent);font-weight:700;">${{ customer.total_spent }}</td>
+            <td style="color:var(--dim);font-size:11px;">{{ customer.last_order_at|default:'—' }}</td>
+            <td>
+              <a class="table-btn" href="/staff/customers/{{ customer.user_id }}/" id="customer-view-{{ customer.user_id }}">View</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="table-actions-row customer-pager-row">
+      {% if customer_rows_page.has_previous %}
+      <a class="table-btn" href="?range={{ selected_range_days }}&page={{ customer_rows_page.previous_page_number }}{% if customer_query %}&q={{ customer_query }}{% endif %}" id="customer-prev-btn">← Prev</a>
+      {% endif %}
+      <span style="font-size:12px;color:var(--muted);">Page {{ customer_rows_page.number }} / {{ customer_rows_page.paginator.num_pages }}</span>
+      {% if customer_rows_page.has_next %}
+      <a class="table-btn" href="?range={{ selected_range_days }}&page={{ customer_rows_page.next_page_number }}{% if customer_query %}&q={{ customer_query }}{% endif %}" id="customer-next-btn">Next →</a>
+      {% endif %}
+    </div>
+    {% else %}
+    <p style="color:var(--dim);font-size:13px;margin-top:16px;">No customer data found.</p>
+    {% endif %}
+  </div>
+
+  <!-- Right: Per-Customer Purchase History -->
+  <div class="panel">
+    <h2>Purchase History</h2>
+    <p class="panel-subtitle">Latest paid orders per top customer.</p>
+    {% if history_customers %}
+    <div class="history-list-wrap">
+      {% for customer in history_customers %}
+      <div class="history-block">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <div>
+            <h3 style="font-size:13px;">{{ customer.display_name|default:customer.username }}</h3>
+            <p class="history-identity-note">@{{ customer.username }} · ${{ customer.total_spent }} total</p>
+          </div>
+          <a class="table-btn" href="/staff/customers/{{ customer.user_id }}/" id="hist-view-{{ customer.user_id }}">View →</a>
+        </div>
+        {% if customer.recent_paid_orders %}
+        <table class="staff-items-table compact-table">
+          <thead><tr><th>Order</th><th>Date</th><th>Total</th></tr></thead>
+          <tbody>
+            {% for purchase in customer.recent_paid_orders %}
+            <tr>
+              <td>#{{ purchase.order_id }}</td>
+              <td style="font-size:11px;color:var(--dim);">{{ purchase.created_at }}</td>
+              <td style="color:var(--accent);font-weight:700;">${{ purchase.total_amount }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <p style="font-size:12px;color:var(--dim);">No paid orders yet.</p>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p style="color:var(--dim);font-size:13px;">No purchase history available.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

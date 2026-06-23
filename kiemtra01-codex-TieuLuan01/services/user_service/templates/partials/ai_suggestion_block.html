@@ -1,0 +1,49 @@
+<section class="ai-block" data-reveal>
+  <div class="ai-block-head">
+    <div>
+      <span>{{ ai_block.badge|default:"AI Layer" }}</span>
+      <h2>{{ ai_block.title }}</h2>
+      <div class="ai-block-summary">{{ ai_block.summary|linebreaksbr }}</div>
+    </div>
+    <div class="ai-block-meta">
+      {% if ai_block.source %}
+      <strong>Source: {{ ai_block.source }}</strong>
+      {% endif %}
+      {% if ai_block.fallback_used %}
+      <span>Fallback active</span>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if ai_block.recommendations %}
+  <div class="ai-suggestion-grid">
+    {% for item in ai_block.recommendations %}
+    <article class="ai-suggestion-card">
+      <a class="ai-suggestion-image" href="{{ item.url }}">
+        <span class="product-service">{{ item.category_name|default:item.category_slug|title }}</span>
+        <img loading="lazy" src="{{ item.image_url }}" data-fallback-src="{{ item.image_fallback_url }}" onerror="this.onerror=null;this.src=this.dataset.fallbackSrc;" alt="{{ item.name }}">
+      </a>
+      <div class="ai-suggestion-copy">
+        <h3>{{ item.name }}</h3>
+        <p>{{ item.brand|default:'Generic Brand' }} | {{ item.category_name|default:item.category_slug|title }}</p>
+      </div>
+      <div class="price-row">
+        <strong>${{ item.price }}</strong>
+        <span>Stock: {{ item.stock }}</span>
+      </div>
+      <a class="cta-dark ai-suggestion-link" href="{{ item.url }}">View Suggestion</a>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">AI does not have a confident suggestion yet. Adjust the current flow and try again.</div>
+  {% endif %}
+
+  {% if ai_block.citations %}
+  <div class="ai-citation-row">
+    {% for citation in ai_block.citations %}
+    <a href="{{ citation.url|default:'#' }}">{{ citation.label }}</a>
+    {% endfor %}
+  </div>
+  {% endif %}
+</section>

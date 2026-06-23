@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Staff Portal{% endblock %} — Nike Lab Staff</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="/static/css/staff_styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='28'>🛠</text></svg>">
+</head>
+<body class="staff-body">
+  <div class="layout-shell">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <span style="color:var(--accent);font-size:20px;font-weight:800;">Nike</span> Lab
+        <span>Staff Console</span>
+      </div>
+      <nav>
+        <a href="/staff/dashboard/" class="{% if request.resolver_match.url_name == 'staff_dashboard' %}active{% endif %}">
+          <span class="sidebar-icon">📊</span> Dashboard
+        </a>
+        <a href="/staff/items/?category=all" class="{% if request.resolver_match.url_name == 'staff_items' %}active{% endif %}">
+          <span class="sidebar-icon">📦</span> Products
+        </a>
+        <a href="/staff/customers/" class="{% if 'customer' in request.resolver_match.url_name %}active{% endif %}">
+          <span class="sidebar-icon">👥</span> Customers
+        </a>
+        <a href="/staff/orders/" class="{% if request.resolver_match.url_name == 'staff_orders' %}active{% endif %}">
+          <span class="sidebar-icon">🛍</span> Orders
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="sidebar-avatar">{{ request.user.username|slice:":1"|upper }}</div>
+          <div>
+            <div style="color:var(--text);font-weight:600;font-size:12px;">{{ request.user.username }}</div>
+            <div style="font-size:11px;">Staff</div>
+          </div>
+        </div>
+        <a href="/staff/logout/" class="table-btn danger" style="width:100%;margin-top:8px;justify-content:center;">
+          ← Logout
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main-content">
+      {% include 'partials/messages.html' %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</body>
+</html>

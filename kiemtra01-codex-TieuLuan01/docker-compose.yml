@@ -1,0 +1,251 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: kiemtra01_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 15s
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql-init:/docker-entrypoint-initdb.d
+
+  postgres:
+    image: postgres:16
+    container_name: kiemtra01_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $$POSTGRES_USER -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres-init:/docker-entrypoint-initdb.d
+
+  neo4j:
+    image: neo4j:5.26
+    container_name: kiemtra01_neo4j
+    hostname: neo4j
+    restart: unless-stopped
+    environment:
+      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD:-graph_password}
+    healthcheck:
+      test: ["CMD-SHELL", "cypher-shell -a bolt://127.0.0.1:7687 -u neo4j -p ${NEO4J_PASSWORD:-graph_password} 'RETURN 1;'"]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+      start_period: 30s
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+
+  product_service:
+    build: ./services/product_service
+    container_name: kiemtra01_product
+    hostname: product-service
+    restart: unless-stopped
+    environment:
+      DJANGO_DEBUG: "1"
+      DJANGO_ALLOWED_HOSTS: "*"
+      POSTGRES_DB: ${PRODUCT_POSTGRES_DB:-product_db}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      STAFF_API_KEY: ${STAFF_API_KEY:-dev-staff-key}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8001:8000"
+
+  chatbot_service:
+    build: ./services/chatbot_service
+    container_name: kiemtra01_chatbot
+    hostname: chatbot-service
+    restart: unless-stopped
+    environment:
+      DJANGO_DEBUG: "1"
+      DJANGO_ALLOWED_HOSTS: "*"
+      POSTGRES_DB: ${CHATBOT_POSTGRES_DB:-chatbot_db}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      PRODUCT_SERVICE_URL: http://product-service:8000
+      LLM_PROVIDER: ${LLM_PROVIDER:-gemma}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      OPENROUTER_BASE_URL: ${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1/chat/completions}
+      OPENROUTER_SITE_URL: ${OPENROUTER_SITE_URL:-}
+      OPENROUTER_APP_NAME: ${OPENROUTER_APP_NAME:-kiemtra01-chatbot}
+      GEMMA_MODEL: ${GEMMA_MODEL:-gemma-4-31b-it}
+      GEMMA_TIMEOUT_SECONDS: ${GEMMA_TIMEOUT_SECONDS:-45}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${CHATBOT_GEMINI_MODEL:-gemini-3.1-flash-lite-preview}
+      GEMINI_TIMEOUT_SECONDS: ${GEMINI_TIMEOUT_SECONDS:-35}
+      NEO4J_URI: ${NEO4J_URI:-bolt://neo4j:7687}
+      NEO4J_USERNAME: ${NEO4J_USERNAME:-neo4j}
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD:-graph_password}
+      NEO4J_DATABASE: ${NEO4J_DATABASE:-neo4j}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      product_service:
+        condition: service_started
+    volumes:
+      - ./services/chatbot_service/chatbot/artifacts:/app/chatbot/artifacts
+    ports:
+      - "8005:8000"
+
+  payment_service:
+    build: ./services/payment_service
+    container_name: kiemtra01_payment
+    hostname: payment-service
+    restart: unless-stopped
+    environment:
+      DJANGO_DEBUG: "1"
+      DJANGO_ALLOWED_HOSTS: "*"
+      PAYMENT_POSTGRES_DB: ${PAYMENT_POSTGRES_DB:-payment_db}
+      PAYMENT_POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      PAYMENT_POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      PAYMENT_POSTGRES_HOST: postgres
+      PAYMENT_POSTGRES_PORT: "5432"
+      ORDER_SERVICE_INTERNAL_KEY: ${ORDER_SERVICE_INTERNAL_KEY:-dev-order-internal-key}
+      PAYMENT_SERVICE_INTERNAL_KEY: ${PAYMENT_SERVICE_INTERNAL_KEY:-dev-order-internal-key}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  shipping_service:
+    build: ./services/shipping_service
+    container_name: kiemtra01_shipping
+    hostname: shipping-service
+    restart: unless-stopped
+    environment:
+      DJANGO_DEBUG: "1"
+      DJANGO_ALLOWED_HOSTS: "*"
+      SHIPPING_POSTGRES_DB: ${SHIPPING_POSTGRES_DB:-shipping_db}
+      SHIPPING_POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      SHIPPING_POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      SHIPPING_POSTGRES_HOST: postgres
+      SHIPPING_POSTGRES_PORT: "5432"
+      ORDER_SERVICE_INTERNAL_KEY: ${ORDER_SERVICE_INTERNAL_KEY:-dev-order-internal-key}
+      SHIPPING_SERVICE_INTERNAL_KEY: ${SHIPPING_SERVICE_INTERNAL_KEY:-dev-order-internal-key}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  order_service:
+    build: ./services/order_service
+    container_name: kiemtra01_order
+    hostname: order-service
+    restart: unless-stopped
+    environment:
+      DJANGO_DEBUG: "1"
+      DJANGO_ALLOWED_HOSTS: "*"
+      DJANGO_CSRF_TRUSTED_ORIGINS: ${DJANGO_CSRF_TRUSTED_ORIGINS:-http://localhost:8080,http://127.0.0.1:8080,http://localhost:8000,http://127.0.0.1:8000,http://localhost:8003,http://127.0.0.1:8003}
+      MYSQL_HOST: mysql
+      MYSQL_PORT: "3306"
+      MYSQL_DATABASE: ${ORDER_MYSQL_DATABASE:-order_db}
+      MYSQL_USER: ${ORDER_MYSQL_USER:-order_user}
+      MYSQL_PASSWORD: ${ORDER_MYSQL_PASSWORD:-order_password}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
+      ORDER_SERVICE_INTERNAL_KEY: ${ORDER_SERVICE_INTERNAL_KEY:-dev-order-internal-key}
+      PAYMENT_SERVICE_URL: ${PAYMENT_SERVICE_URL:-http://payment-service:8000}
+      SHIPPING_SERVICE_URL: ${SHIPPING_SERVICE_URL:-http://shipping-service:8000}
+      PAYMENT_SERVICE_INTERNAL_KEY: ${PAYMENT_SERVICE_INTERNAL_KEY:-dev-order-internal-key}
+      SHIPPING_SERVICE_INTERNAL_KEY: ${SHIPPING_SERVICE_INTERNAL_KEY:-dev-order-internal-key}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      payment_service:
+        condition: service_started
+      shipping_service:
+        condition: service_started
+
+  user_service:
+    build: ./services/user_service
+    container_name: kiemtra01_user
+    hostname: user-service
+    restart: unless-stopped
+    environment:
+      DJANGO_DEBUG: "1"
+      DJANGO_ALLOWED_HOSTS: "*"
+      MYSQL_HOST: mysql
+      MYSQL_PORT: "3306"
+      MYSQL_DATABASE: ${USER_MYSQL_DATABASE:-user_db}
+      MYSQL_USER: ${USER_MYSQL_USER:-user_user}
+      MYSQL_PASSWORD: ${USER_MYSQL_PASSWORD:-user_password}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
+      USER_SERVICE_URL: http://user-service:8000
+      PRODUCT_SERVICE_URL: http://product-service:8000
+      ORDER_SERVICE_URL: http://order-service:8000
+      PAYMENT_SERVICE_URL: http://payment-service:8000
+      SHIPPING_SERVICE_URL: http://shipping-service:8000
+      CHATBOT_SERVICE_URL: http://chatbot-service:8000
+      ORDER_SERVICE_INTERNAL_KEY: ${ORDER_SERVICE_INTERNAL_KEY:-dev-order-internal-key}
+      STAFF_API_KEY: ${STAFF_API_KEY:-dev-staff-key}
+      CUSTOMER_SESSION_COOKIE_NAME: ${CUSTOMER_SESSION_COOKIE_NAME:-customer_sessionid}
+      STAFF_SESSION_COOKIE_NAME: ${STAFF_SESSION_COOKIE_NAME:-staff_sessionid}
+      CHATBOT_REQUEST_TIMEOUT_SECONDS: ${CHATBOT_REQUEST_TIMEOUT_SECONDS:-40}
+      CHATBOT_REQUEST_RETRIES: ${CHATBOT_REQUEST_RETRIES:-2}
+      CHATBOT_INGEST_KEY: ${CHATBOT_INGEST_KEY:-}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      product_service:
+        condition: service_started
+      order_service:
+        condition: service_started
+      payment_service:
+        condition: service_started
+      shipping_service:
+        condition: service_started
+      chatbot_service:
+        condition: service_started
+    ports:
+      - "8000:8000"
+      - "8003:8000"
+
+  gateway:
+    image: nginx:1.27-alpine
+    container_name: kiemtra01_gateway
+    hostname: gateway
+    restart: unless-stopped
+    depends_on:
+      user_service:
+        condition: service_started
+      product_service:
+        condition: service_started
+      order_service:
+        condition: service_started
+      payment_service:
+        condition: service_started
+      shipping_service:
+        condition: service_started
+      chatbot_service:
+        condition: service_started
+    volumes:
+      - ./docker/gateway/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "8080:80"
+
+volumes:
+  mysql_data:
+  postgres_data:
+  neo4j_data:
+  neo4j_logs:

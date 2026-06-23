@@ -1,0 +1,107 @@
+{
+  "sequence_length": 5,
+  "feature_order": [
+    "behavior_type",
+    "category_slug",
+    "price_bucket",
+    "device_type"
+  ],
+  "features": {
+    "behavior_type": {
+      "pad_token": "[PAD]",
+      "oov_token": "[OOV]",
+      "vocab": [
+        "search",
+        "view_product",
+        "chatbot_ask",
+        "save_item",
+        "compare_item",
+        "add_to_cart",
+        "checkout",
+        "pay_order"
+      ],
+      "index": {
+        "[PAD]": 0,
+        "[OOV]": 1,
+        "search": 2,
+        "view_product": 3,
+        "chatbot_ask": 4,
+        "save_item": 5,
+        "compare_item": 6,
+        "add_to_cart": 7,
+        "checkout": 8,
+        "pay_order": 9
+      }
+    },
+    "category_slug": {
+      "pad_token": "[PAD]",
+      "oov_token": "[OOV]",
+      "vocab": [
+        "",
+        "business-laptops",
+        "gaming-laptops",
+        "ultrabooks",
+        "smartphones",
+        "tablets",
+        "smartwatches",
+        "audio",
+        "keyboards-mice",
+        "chargers-cables",
+        "bags-stands"
+      ],
+      "index": {
+        "[PAD]": 0,
+        "[OOV]": 1,
+        "": 2,
+        "business-laptops": 3,
+        "gaming-laptops": 4,
+        "ultrabooks": 5,
+        "smartphones": 6,
+        "tablets": 7,
+        "smartwatches": 8,
+        "audio": 9,
+        "keyboards-mice": 10,
+        "chargers-cables": 11,
+        "bags-stands": 12
+      }
+    },
+    "price_bucket": {
+      "pad_token": "[PAD]",
+      "oov_token": "[OOV]",
+      "vocab": [
+        "under_500",
+        "500_1000",
+        "1000_2000",
+        "above_2000",
+        "unknown"
+      ],
+      "index": {
+        "[PAD]": 0,
+        "[OOV]": 1,
+        "under_500": 2,
+        "500_1000": 3,
+        "1000_2000": 4,
+        "above_2000": 5,
+        "unknown": 6
+      }
+    },
+    "device_type": {
+      "pad_token": "[PAD]",
+      "oov_token": "[OOV]",
+      "vocab": [
+        "desktop",
+        "mobile",
+        "tablet",
+        "unknown"
+      ],
+      "index": {
+        "[PAD]": 0,
+        "[OOV]": 1,
+        "desktop": 2,
+        "mobile": 3,
+        "tablet": 4,
+        "unknown": 5
+      }
+    }
+  }
+}

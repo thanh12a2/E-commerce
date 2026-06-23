@@ -1,0 +1,50 @@
+{
+  "user_count": 500,
+  "event_count": 10948,
+  "session_count": 2712,
+  "behavior_distribution": {
+    "view_product": 3036,
+    "search": 2943,
+    "add_to_cart": 1130,
+    "checkout": 1127,
+    "pay_order": 1127,
+    "save_item": 573,
+    "chatbot_ask": 547,
+    "compare_item": 465
+  },
+  "category_distribution": {
+    "smartphones": 2005,
+    "business-laptops": 1281,
+    "smartwatches": 1200,
+    "audio": 1113,
+    "bags-stands": 1043,
+    "chargers-cables": 1039,
+    "ultrabooks": 904,
+    "keyboards-mice": 820,
+    "tablets": 806,
+    "gaming-laptops": 737
+  },
+  "device_type_distribution": {
+    "mobile": 4971,
+    "desktop": 3917,
+    "tablet": 1143,
+    "unknown": 917
+  },
+  "price_bucket_distribution": {
+    "under_500": 3642,
+    "unknown": 2943,
+    "1000_2000": 2541,
+    "500_1000": 1518,
+    "above_2000": 304
+  },
+  "supervised_row_count": 8236,
+  "terminal_row_count": 2712,
+  "avg_events_per_session": 4.04,
+  "avg_sessions_per_user": 5.42,
+  "min_sessions_per_user": 4,
+  "max_sessions_per_user": 7,
+  "max_session_length": 6,
+  "unique_product_count": 100,
+  "catalog_source": "product_service",
+  "seed": 20260420
+}

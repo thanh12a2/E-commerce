@@ -1,0 +1,57 @@
+{% extends 'staff/base.html' %}
+{% block title %}Edit Customer: {{ customer.username }}{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <a style="font-size:12px;color:var(--muted);display:inline-flex;align-items:center;gap:4px;margin-bottom:8px;" href="/staff/customers/{{ customer.id }}/">← Back to Profile</a>
+    <h1>Edit Customer Account</h1>
+    <p class="subtitle">Update profile details for @{{ customer.username }}.</p>
+  </div>
+</div>
+
+<div style="max-width:600px;">
+  <div class="panel">
+    <div class="customer-detail-header" style="margin-bottom:20px;">
+      <div class="customer-avatar-lg">{{ customer.username|slice:":1"|upper }}</div>
+      <div class="customer-meta">
+        <h2 style="font-size:18px;font-weight:700;margin:0;">{{ customer.username }}</h2>
+        <p>{{ customer.email|default:'No email' }}</p>
+      </div>
+      <span class="badge-status {% if customer.is_active %}badge-active{% else %}badge-inactive{% endif %}" style="margin-left:auto;">
+        {% if customer.is_active %}Active{% else %}Inactive{% endif %}
+      </span>
+    </div>
+
+    <form method="post" action="/staff/customers/{{ customer.id }}/edit/" id="customer-edit-form">
+      {% csrf_token %}
+      <div style="display:grid;gap:14px;">
+        <div>
+          <label>Username</label>
+          {{ form.username }}
+          {% if form.username.errors %}<p style="color:var(--error);font-size:12px;margin-top:4px;">{{ form.username.errors.0 }}</p>{% endif %}
+        </div>
+        <div>
+          <label>Email Address</label>
+          {{ form.email }}
+          {% if form.email.errors %}<p style="color:var(--error);font-size:12px;margin-top:4px;">{{ form.email.errors.0 }}</p>{% endif %}
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div>
+            <label>First Name</label>
+            {{ form.first_name }}
+          </div>
+          <div>
+            <label>Last Name</label>
+            {{ form.last_name }}
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:20px;">
+        <button type="submit" class="table-btn primary" id="customer-edit-submit">💾 Save Changes</button>
+        <a class="table-btn" href="/staff/customers/{{ customer.id }}/" id="customer-edit-cancel">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'customer/base.html' %}
+{% block title %}Sign In — Nike Lab{% endblock %}
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo">Nike <span style="color:var(--muted);font-weight:400;font-size:16px;">Lab</span></div>
+    <h1>Welcome back</h1>
+    <p class="subtitle">Sign in to your account to continue shopping.</p>
+
+    {% if form.non_field_errors %}
+    <div class="auth-error">{{ form.non_field_errors.0 }}</div>
+    {% endif %}
+    {% include 'partials/messages.html' %}
+
+    <form class="auth-form" method="post" action="/customer/login/" id="login-form">
+      {% csrf_token %}
+      <div class="auth-field">
+        <label for="id_username">Username</label>
+        {{ form.username }}
+      </div>
+      <div class="auth-field">
+        <label for="id_password">Password</label>
+        {{ form.password }}
+      </div>
+      <button type="submit" class="cta-green auth-submit" id="login-submit-btn">Sign In</button>
+    </form>
+    <p class="auth-switch">Don't have an account? <a href="/customer/register/">Create one</a></p>
+  </div>
+</div>
+{% endblock %}

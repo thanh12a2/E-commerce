@@ -1,0 +1,8 @@
+Selected model_best: rnn
+Selection rule: prioritize macro F1, then prefer lighter/simple models when macro F1 gap <= 0.002.
+Winner macro F1: 0.999410
+Winner accuracy: 0.999201
+Winner macro precision: 0.999587
+Winner macro recall: 0.999237
+Winner params: 11192
+Multiple models were within the tie tolerance, so model size and inference simplicity were used as the final tie-break.

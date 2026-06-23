@@ -1,0 +1,158 @@
+{% extends 'customer/base.html' %}
+{% block title %}{{ product.name }} — Nike Lab{% endblock %}
+{% block content %}
+
+<!-- Breadcrumb -->
+<div style="margin-bottom:20px;font-size:12px;color:var(--dim);display:flex;gap:6px;align-items:center;">
+  <a href="/customer/dashboard/" style="color:var(--muted);">Home</a>
+  <span>/</span>
+  <a href="/customer/dashboard/?category={{ product.category_slug }}#section-products" style="color:var(--muted);">{{ product.category_name|default:product.category_slug|title }}</a>
+  <span>/</span>
+  <span style="color:var(--text);">{{ product.name }}</span>
+</div>
+
+<!-- Product Detail Shell -->
+<section class="product-detail-shell" data-reveal>
+  <!-- Gallery -->
+  <article class="detail-gallery">
+    <div class="detail-main-image-wrap">
+      <span class="badge-on-image">{{ product.category_name|default:product.category_slug|title }}</span>
+      <img id="detail-main-image" class="detail-main-image" loading="eager" src="{{ gallery_images.0 }}" data-fallback-src="{{ product.image_fallback_url }}" onerror="this.onerror=null;this.src=this.dataset.fallbackSrc;" alt="{{ product.name }}">
+    </div>
+    <div class="detail-thumbs">
+      {% for image in gallery_images %}
+      <button type="button" class="thumb-btn {% if forloop.first %}active{% endif %}" data-gallery-thumb data-image="{{ image }}" aria-label="View image {{ forloop.counter }}">
+        <img loading="lazy" src="{{ image }}" data-fallback-src="{{ product.image_fallback_url }}" onerror="this.onerror=null;this.src=this.dataset.fallbackSrc;" alt="{{ product.name }} view {{ forloop.counter }}">
+      </button>
+      {% endfor %}
+    </div>
+  </article>
+
+  <!-- Info -->
+  <aside class="detail-info">
+    <p class="detail-kicker">{{ product.brand|default:'Generic Brand' }} · #{{ product.id }}</p>
+    <h1>{{ product.name }}</h1>
+    <p class="detail-brand">{{ product.category_name|default:product.category_slug|title }}</p>
+    <div class="detail-price">${{ product.price }}</div>
+    <p class="detail-stock {% if product.stock|add:0 > 0 %}stock-ok{% else %}stock-out{% endif %}">
+      {% if product.stock|add:0 > 0 %}✓ In stock ({{ product.stock }} units){% else %}✗ Out of stock{% endif %}
+    </p>
+    <hr class="detail-divider">
+    <p class="detail-desc">{{ product.description|default:'No product description available yet.' }}</p>
+
+    <!-- Specs -->
+    <div style="background:var(--surface-2);border:1px solid rgba(255,255,255,0.06);border-radius:var(--r-sm);padding:12px;margin-top:14px;display:grid;gap:8px;font-size:13px;">
+      <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Category</span><strong>{{ product.category_name|default:product.category_slug|title }}</strong></div>
+      <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Brand</span><strong>{{ product.brand|default:'N/A' }}</strong></div>
+      <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Product ID</span><strong>#{{ product.id }}</strong></div>
+      <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Status</span><strong class="{% if product.stock|add:0 > 0 %}stock-ok{% else %}stock-out{% endif %}">{% if product.stock|add:0 > 0 %}Available{% else %}Sold Out{% endif %}</strong></div>
+    </div>
+
+    <!-- Primary action -->
+    <div class="detail-actions">
+      <form method="post" action="/customer/cart/add/" id="detail-cart-form">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <input type="hidden" name="category_slug" value="{{ product.category_slug }}">
+        <input type="hidden" name="category_name" value="{{ product.category_name }}">
+        <input type="hidden" name="product_id" value="{{ product.id }}">
+        <input type="hidden" name="product_name" value="{{ product.name }}">
+        <input type="hidden" name="product_brand" value="{{ product.brand }}">
+        <input type="hidden" name="product_image_url" value="{{ product.image_url }}">
+        <input type="hidden" name="unit_price" value="{{ product.price }}">
+        <input type="hidden" name="stock" value="{{ product.stock }}">
+        <button class="cta-green btn-lg" style="width:100%;" type="submit" id="detail-add-cart-btn" {% if not product.stock|add:0 %}disabled style="opacity:.4;"{% endif %}>🛒 Add to Cart — ${{ product.price }}</button>
+      </form>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <form method="post" action="/customer/saved/toggle/" id="detail-save-form">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <input type="hidden" name="category_slug" value="{{ product.category_slug }}">
+          <input type="hidden" name="category_name" value="{{ product.category_name }}">
+          <input type="hidden" name="product_id" value="{{ product.id }}">
+          <input type="hidden" name="product_name" value="{{ product.name }}">
+          <input type="hidden" name="product_brand" value="{{ product.brand }}">
+          <input type="hidden" name="product_image_url" value="{{ product.image_url }}">
+          <input type="hidden" name="unit_price" value="{{ product.price }}">
+          <input type="hidden" name="stock" value="{{ product.stock }}">
+          <button class="cta-light" style="width:100%;" type="submit" id="detail-save-btn">{% if is_saved %}♥ Saved{% else %}♡ Save{% endif %}</button>
+        </form>
+        <form method="post" action="/customer/compare/toggle/" id="detail-compare-form">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <input type="hidden" name="category_slug" value="{{ product.category_slug }}">
+          <input type="hidden" name="category_name" value="{{ product.category_name }}">
+          <input type="hidden" name="product_id" value="{{ product.id }}">
+          <input type="hidden" name="product_name" value="{{ product.name }}">
+          <input type="hidden" name="product_brand" value="{{ product.brand }}">
+          <input type="hidden" name="product_image_url" value="{{ product.image_url }}">
+          <input type="hidden" name="unit_price" value="{{ product.price }}">
+          <input type="hidden" name="stock" value="{{ product.stock }}">
+          <button class="cta-light" style="width:100%;" type="submit" id="detail-compare-btn">{% if is_compared %}⚖ Compared{% else %}⚖ Compare{% endif %}</button>
+        </form>
+      </div>
+
+      <div style="display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;">
+        <a class="cta-outline btn-sm" href="/customer/dashboard/#section-products" id="detail-back-btn">← Back</a>
+        <a class="cta-outline btn-sm" href="/customer/compare/" id="detail-compare-list-btn">Compare List ({{ compare_count }})</a>
+        <a class="cta-outline btn-sm" href="/customer/cart/" id="detail-cart-link">Cart</a>
+      </div>
+    </div>
+  </aside>
+</section>
+
+<!-- Recommended -->
+<section id="section-recommend-products" class="content-block" data-reveal>
+  <div class="section-head" style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;">
+    <div>
+      <span class="section-tag">Recommended</span>
+      <h2>You May Also <em>Like</em></h2>
+    </div>
+    <div class="rec-mode-row" style="margin:0;">
+      <a class="rec-mode-chip {% if rec_mode == 'mixed' %}active{% endif %}" href="{{ rec_mode_mixed_url }}" id="rec-mixed-btn">Mixed</a>
+      <a class="rec-mode-chip {% if rec_mode == 'similar' %}active{% endif %}" href="{{ rec_mode_similar_url }}" id="rec-similar-btn">Similar Only</a>
+    </div>
+  </div>
+
+  {% if related_products %}
+  <div class="product-grid">
+    {% for item in related_products %}
+    <article class="store-card">
+      <a class="product-image mini-image" href="/customer/products/{{ item.category_slug }}/{{ item.id }}/" id="rec-img-{{ item.id }}">
+        <span class="product-service">{{ item.category_name|default:item.category_slug|title }}</span>
+        <img loading="lazy" src="{{ item.image_url }}" data-fallback-src="{{ item.image_fallback_url|default:product.image_fallback_url }}" onerror="this.onerror=null;this.src=this.dataset.fallbackSrc;" alt="{{ item.name }}">
+      </a>
+      <div class="product-meta">
+        <h3>{{ item.name }}</h3>
+        <p>{{ item.brand|default:'N/A' }}</p>
+        <p style="font-size:12px;color:var(--dim);">{{ item.description|default:''|truncatechars:72 }}</p>
+      </div>
+      <div class="price-row">
+        <strong>${{ item.price }}</strong>
+        <span>{{ item.stock }} in stock</span>
+      </div>
+      <div class="card-actions-row">
+        <a class="cta-light" href="/customer/products/{{ item.category_slug }}/{{ item.id }}/" id="rec-view-{{ item.id }}">View →</a>
+        <form method="post" action="/customer/cart/add/" class="add-form-inline" id="rec-cart-form-{{ item.id }}">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <input type="hidden" name="category_slug" value="{{ item.category_slug }}">
+          <input type="hidden" name="category_name" value="{{ item.category_name }}">
+          <input type="hidden" name="product_id" value="{{ item.id }}">
+          <input type="hidden" name="product_name" value="{{ item.name }}">
+          <input type="hidden" name="product_brand" value="{{ item.brand }}">
+          <input type="hidden" name="product_image_url" value="{{ item.image_url }}">
+          <input type="hidden" name="unit_price" value="{{ item.price }}">
+          <input type="hidden" name="stock" value="{{ item.stock }}">
+          <button class="cta-green" type="submit" id="rec-cart-{{ item.id }}">Add</button>
+        </form>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">No related products right now.</div>
+  {% endif %}
+</section>
+{% endblock %}
